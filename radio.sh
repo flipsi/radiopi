@@ -33,7 +33,9 @@ OPTIONS
 
     --kill | -k                 Stop any radio that was started in the background.
 
-    --non-interactive | -n      Stop any radio that was started in the background.
+    --status | -s               Print information about currently played station.
+
+    --non-interactive | -n      If query matches more than one station, don't choose interactively.
 
     --help | -h                 Print this help message.
 
@@ -63,6 +65,7 @@ RADIO_STATION_LIST["fip Radio"]="http://direct.fipradio.fr/live/fip-midfi.mp3"
 ALSA_DEVICE="${ALSA_DEVICE:-plughw:CARD=sndrpihifiberry,DEV=0}"
 
 PIDFILE=/tmp/radiopi_playback.pid
+STATUSFILE=/tmp/radiopi_status.txt
 
 
 function _test_audio_stream_url() {
@@ -94,7 +97,8 @@ function _pick_station_interactively() {
 }
 
 function _start_playback() {
-    local AUDIO_SRC="$1"
+    local TITLE="$1"
+    local AUDIO_SRC="$2"
     if ! _test_audio_stream_url "$AUDIO_SRC"; then
         echo "ERROR: $AUDIO_SRC does not look like an audio source."
         exit 2
@@ -110,25 +114,43 @@ function _start_playback() {
         --no-volume-save \
         "$AUDIO_SRC"
     )
+    echo "Currently playing $TITLE..." > "$STATUSFILE"
     if [[ -n "$DETACH" ]]; then
         cvlc "${VLC_ARGS[@]}" & echo $! > $PIDFILE
     else
-        cvlc "${VLC_ARGS[@]}"
+        cvlc "${VLC_ARGS[@]}" # play until interrupt
+        _cleanup_after_playback
     fi
 }
 
 function _stop_playback() {
-    if [[ ! -f ${PIDFILE} ]]; then
-        echo "WARNING: Did not find PID file ${PIDFILE}"
+    if [[ ! -f $PIDFILE ]]; then
+        echo "WARNING: Did not find PID file $PIDFILE"
     else
-        PID=$(cat ${PIDFILE})
-        if ps "${PID}" >/dev/null; then
-            echo "Killing process with PID ${PID}"
-            kill "${PID}" && rm ${PIDFILE}
+        PID=$(cat $PIDFILE)
+        if ps "$PID" >/dev/null; then
+            echo "Killing process with PID $PID"
+            kill "$PID" && rm $PIDFILE
         else
-            echo "WARNING: No process found with PID ${PID}"
-            rm ${PIDFILE}
+            echo "WARNING: No process found with PID $PID"
+            rm "$PIDFILE"
         fi
+    fi
+    _cleanup_after_playback
+}
+
+function _cleanup_after_playback() {
+    if [[ -f "$STATUSFILE" ]]; then
+        rm "$STATUSFILE"
+    fi
+}
+
+function _print_status_msg() {
+    if [[ -f "$STATUSFILE" ]]; then
+        cat "$STATUSFILE"
+    else
+        echo "Nothing playing."
+        exit 1
     fi
 }
 
@@ -136,8 +158,10 @@ function _main() {
     local QUERY_OR_URL="$1"
     if [[ -n "$QUERY_OR_URL" ]] && _test_audio_stream_url "$QUERY_OR_URL"; then
         AUDIO_SRC="$QUERY_OR_URL"
+        TITLE="$AUDIO_SRC"
     elif [[ -n "$QUERY_OR_URL" && -n "${RADIO_STATION_LIST[$QUERY_OR_URL]}" ]]; then
         AUDIO_SRC="${RADIO_STATION_LIST[$QUERY_OR_URL]}"
+        TITLE="$QUERY_OR_URL"
     elif [[ -n "$NON_INTERACTIVE" ]]; then
         echo "ERROR: Station not found"
         exit 1
@@ -148,9 +172,10 @@ function _main() {
             exit 1
         else
             AUDIO_SRC="${RADIO_STATION_LIST[$STATION]}"
+            TITLE="$STATION"
         fi
     fi
-    _start_playback "$AUDIO_SRC"
+    _start_playback "$TITLE" "$AUDIO_SRC"
 }
 
 
@@ -172,6 +197,10 @@ while [[ $# -gt 0 ]]; do
         --detach|-d)
             DETACH=1;
             shift
+            ;;
+        --status|-s)
+            _print_status_msg;
+            exit 0
             ;;
         --kill|-k)
             _stop_playback;
