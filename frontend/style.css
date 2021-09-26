@@ -1,0 +1,167 @@
+html,
+body {
+  color: #ddd;
+  background-color: #333;
+  position: relative;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow: hidden; /* make browser scrollbar disappear */
+}
+
+body {
+  font-family: 'Krona One', Arial, sans-serif;
+  font-size: 14px;'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.4em;
+  font-weight: 300;
+  padding: 10px;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 1.5em;
+  line-height: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  color: #888;
+}
+
+main {
+  font-size: 1.1em;
+}
+
+
+.material-icons {
+  color: #A42;
+  vertical-align: middle;
+  font-size: 48px;
+}
+
+.radiostatus {
+  color: #888;
+  margin: 30px 0 30px 0;
+}
+
+#stationlist {
+  padding-left: 10px;
+  list-style: none;
+  line-height: 3em;
+}
+#stationlist .material-icons {
+    margin-right: 15px;
+}
+
+footer {
+  padding: 10px;
+  position: absolute;
+  bottom: 30px;
+  right: 0;
+}
+footer em {
+  color: #A42;
+}
+
+
+
+.equaliser-container {
+    height: 50px;
+    width: 100%;
+    margin: 0 0;
+    padding: 0 0 0 0;
+    position: relative;
+}
+
+.colour-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50px;
+    background: #888;
+}
+
+.equaliser-column {
+    width: 20px;
+    float: left;
+    margin: 0 5px 0 0;
+    padding: 0;
+    height: 40px;
+    position: relative;
+    list-style-type: none;
+}
+
+.equaliser-column:nth-child(1) .colour-bar {
+    animation: color-bar 2s 1s ease-out alternate infinite;
+}
+
+.equaliser-column:nth-child(2) .colour-bar {
+    animation: color-bar 2s 0.5s ease-out alternate infinite;
+}
+
+.equaliser-column:nth-child(3) .colour-bar {
+    animation: color-bar 2s 1.5s ease-out alternate infinite;
+}
+
+.equaliser-column:nth-child(4) .colour-bar {
+    animation: color-bar 2s 0.25s ease-out alternate infinite;
+}
+
+.equaliser-column:nth-child(5) .colour-bar {
+    animation: color-bar 2s 2s ease-out alternate infinite;
+}
+
+.equaliser-column:last-child {
+    margin-right: 0;
+}
+
+@keyframes color-bar {
+    0% {
+        height: 1px;
+        background: #888;
+    }
+    10% {
+        height: 3px;
+        background: #888;
+    }
+    20% {
+        height: 5px;
+        background: #888;
+    }
+    30% {
+        height: 2px;
+        background: #888;
+    }
+    40% {
+        height: 7px;
+        background: #888;
+    }
+    50% {
+        height: 9px;
+        background: #888;
+    }
+    60% {
+        height: 3px;
+        background: #888;
+    }
+    70% {
+        height: 8px;
+        background: #888;
+    }
+    80% {
+        height: 5px;
+        background: #888;
+    }
+    90% {
+        height: 3px;
+        background: #888;
+    }
+    100% {
+        height: 1px;
+        background: #888;
+    }
+}
