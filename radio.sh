@@ -50,7 +50,6 @@ function require() {
 }
 
 require vlc
-require fzf
 
 
 declare -A RADIO_STATION_LIST
@@ -93,6 +92,7 @@ function _list_stations() {
 
 function _pick_station_interactively() {
     local QUERY_PREFILL="$1"
+    require fzf
     _list_stations | fzf -q "$QUERY_PREFILL"
 }
 
@@ -212,5 +212,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
 
 _main "$QUERY_OR_URL"
