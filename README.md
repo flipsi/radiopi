@@ -6,16 +6,32 @@ It offers a bash script for command line usage and a PHP/JS frontend for the web
 
 ## Installation
 
-TODO
+* Make sure to install dependencies:
+    * ALSA sound system (probably already installed)
+    * vlc
+    * fzf (optionally)
+    * Webserver with PHP (for the frontend)
+* Clone this repository
+* Configure [radio.sh](./radio.sh) to your needs:
+    * Extend $RADIO_STATION_LIST
+    * Set (fallback) $ALSA_DEVICE
+* Configure [frontend](./fontend/index.php):
+    * Set PATH_TO_RADIO_SCRIPT to correct script path of `radio.sh`
+* Configure webserver to be able to access system audio (i.e. add webserver user to `audio` group)
+* Symlink [the frontend](./fontend/) to your webserver's document root
+
 
 ## Usage
 
-TODO
+For `radio.sh` command line usage, refer to the `--help`.
+
+For webserver usage, open the frontend in a browser and click buttons to start or stop the radio.
 
 
 ## Author
 
 Philipp Moers – [@soziflip](https://twitter.com/soziflip)
+
 
 ## License
 
