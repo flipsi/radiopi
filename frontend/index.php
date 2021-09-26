@@ -32,7 +32,7 @@ if (!empty($_POST['action'])) {
     switch ($_POST['action']) {
         case 'start_playback':
             $station = $_POST['station'];
-            exec_radio_script("--non-interactive --detach '$station'", $action_output, $action_exit_code);
+            exec_radio_script("--non-interactive --detach '$station' >/dev/null", $action_output, $action_exit_code);
             break;
         case 'stop_playback':
             exec_radio_script('--kill', $action_output, $action_exit_code);
