@@ -144,6 +144,18 @@ function _test_audio_stream_url() {
     fi
 }
 
+function _verify_vlc_volume_is_decoupled_from_system_volume() {
+    if ! grep -q -E '^flat-volumes = no' '/etc/pulse/daemon.conf'; then
+        cat <<-EOF
+ERROR: Please decouple vlc volume from system volume by adding
+'flat-volumes = no'
+to your /etc/pulse/daemon.conf For details, see
+https://superuser.com/questions/770028/decoupling-vlc-volume-and-system-volume
+EOF
+        exit 1
+    fi
+}
+
 function _configure_vlc_netcat_cmd() {
     if [[ -z "$VLC_NETCAT_CMD" ]]; then
         local NETCAT_HELP_OUTPUT
@@ -343,4 +355,5 @@ while [[ $# -gt 0 ]]; do
 done
 
 
+_verify_vlc_volume_is_decoupled_from_system_volume
 _main "$QUERY_OR_URL"
