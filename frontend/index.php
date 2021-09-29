@@ -13,6 +13,8 @@ define("LOGFILE", "/tmp/radiopi_frontend.log");
 
 $logfile_handler = fopen(LOGFILE, 'a'); // 'a' means append mode
 
+$volume_step = 10;
+
 
 function write_log($log_msg) {
     global $logfile_handler;
@@ -36,6 +38,12 @@ if (!empty($_POST['action'])) {
             break;
         case 'stop_playback':
             exec_radio_script('--kill', $action_output, $action_exit_code);
+            break;
+        case 'volume_down':
+            exec_radio_script("--volume -$volume_step >/dev/null", $action_output, $action_exit_code);
+            break;
+        case 'volume_up':
+            exec_radio_script("--volume +$volume_step >/dev/null", $action_output, $action_exit_code);
             break;
         default:
     }
@@ -86,13 +94,31 @@ header("Expires: 0"); // Proxies.
                 }
             ?>
             </div>
-            <div>
+            <div class="radiocontrols">
                 <form name="stop_playback_form" action="" method="post">
                     <input type="hidden" name="action" value="stop_playback" />
                     <div class="touchable" onClick="document.forms['stop_playback_form'].submit();;">
                         <span class="material-icons">stop</span>
                         Stop playback
                     </div>
+                </form>
+            </div>
+            <div class="radiocontrols">
+                Volume:
+                <form class="inline" name="volume_down_form" action="" method="post">
+                    <input type="hidden" name="action" value="volume_down" />
+                    <span class="touchable" onClick="document.forms['volume_down_form'].submit();;">
+                        <span class="material-icons">volume_down</span>
+                        down
+                    </span>
+                </form>
+                <form class="inline" name="volume_up_form" action="" method="post">
+                    <input type="hidden" name="action" value="volume_up" />
+                    <span class="touchable" onClick="document.forms['volume_up_form'].submit();;">
+                        <span class="material-icons">volume_up</span>
+                        up
+                    </span>
+                </form>
                 </form>
             </div>
             <div class="equaliser-container">

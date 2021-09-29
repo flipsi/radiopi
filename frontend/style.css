@@ -36,6 +36,10 @@ main {
 }
 
 
+.inline {
+  display: inline
+}
+
 .material-icons {
   color: #A42;
   vertical-align: middle;
@@ -45,6 +49,10 @@ main {
 .radiostatus {
   color: #888;
   margin: 30px 0 30px 0;
+}
+
+.radiocontrols {
+  margin-bottom: 20px;
 }
 
 #stationlist {
