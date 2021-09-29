@@ -29,6 +29,16 @@ function exec_radio_script($arguments, &$output, &$exit_code) {
     write_log("... output was: " . print_r($output, true));
 }
 
+function parse_radio_status($radio_status_output) {
+    $radio_status = array();
+    foreach ($radio_status_output as $line) {
+        $split = explode(': ', $line, 2);
+        write_log('cool alter ' . $split[0] . ' und ' . $split[1]);
+        $radio_status[$split[0]] = $split[1];
+    }
+    return $radio_status;
+}
+
 
 if (!empty($_POST['action'])) {
     switch ($_POST['action']) {
@@ -82,18 +92,17 @@ header("Expires: 0"); // Proxies.
 
         <?php
 
-            exec_radio_script('status', $radio_status, $radio_status_exit_code);
+            exec_radio_script('status', $radio_status_output, $radio_status_exit_code);
+            $radio_status = parse_radio_status($radio_status_output);
 
-            if ($radio_status_exit_code === 0) {
+            if ($radio_status['Status'] === 'on') {
 
         ?>
 
             <div class="radiostatus">
-            <?php
-                foreach ($radio_status as $line) {
-                    echo "<span>$line</span>";
-                }
-            ?>
+                Currently playing
+                <?php echo $radio_status['Station']; ?>
+                ...
             </div>
             <div class="radiocontrols">
                 <form name="stop_playback_form" action="" method="post">

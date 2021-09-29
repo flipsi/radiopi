@@ -291,7 +291,8 @@ function _start_playback() {
         "$AUDIO_SRC"
     )
     echo "Now playing $TITLE ($AUDIO_SRC)..."
-    echo "Currently playing $TITLE..." > "$STATUSFILE"
+    echo "Station: $TITLE" > "$STATUSFILE"
+    echo "Stream URL: $AUDIO_SRC" >> "$STATUSFILE"
     vlc "${VLC_ARGS[@]}" & echo $! > $PIDFILE_VLC
     if [[ -n "$VOLUME_INCREMENT_ENABLED" ]]; then
         echo "Volume will be incremented successively..."
@@ -368,10 +369,18 @@ function _start_radio() {
 
 function _print_status_msg() {
     if [[ -f "$STATUSFILE" ]]; then
+        echo "Status: on"
         cat "$STATUSFILE"
+        if [[ -f $PIDFILE_INC ]]; then
+            echo "Volume increment: on"
+        else
+            echo "Volume increment: off"
+        fi
     else
-        echo "Nothing playing."
-        exit 1
+        echo "Status: off"
+    fi
+    if command -v 'crontab' >/dev/null; then
+        _echo_alarm_status
     fi
 }
 
@@ -394,6 +403,21 @@ function _open_crontab() {
 function _close_crontab() {
     # cat "$TMP_CRONTAB" # debug
     crontab < "$TMP_CRONTAB"
+}
+
+function _echo_alarm_status() {
+    if crontab -l >/dev/null 2>&1; then
+        _open_crontab
+        TIME=$(awk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB")
+        if [[ -n "$TIME" ]]; then
+            echo "Alarm: enabled"
+            echo "Alarm time: $TIME"
+        else
+            echo "Alarm: disabled"
+        fi
+    else
+        echo "Alarm: disabled"
+    fi
 }
 
 function _enable_alarm() {
