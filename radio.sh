@@ -96,6 +96,11 @@ VOLUMEFILE="$STATEDIR/vlc.volume"
 STATUSFILE="$STATEDIR/status.txt"
 
 
+function _is_raspberry_pi() {
+    local PI_MODEL_FILE="/proc/device-tree/model"
+    test -f "$PI_MODEL_FILE" && grep -q "Raspberry Pi" "$PI_MODEL_FILE"
+}
+
 function _find_unused_port() {
     for PORT in {9555..9999}; do
         if ! lsof -i :"$PORT" >/dev/null; then
@@ -419,7 +424,9 @@ function _main() {
 
     mkdir -p "$STATEDIR"
 
-    _verify_vlc_volume_is_decoupled_from_system_volume
+    if _is_raspberry_pi; then
+        _verify_vlc_volume_is_decoupled_from_system_volume
+    fi
     _configure_vlc_env
 
     while [[ $# -gt 0 ]]; do
