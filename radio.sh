@@ -62,9 +62,16 @@ require nc
 
 
 declare -A RADIO_STATION_LIST
+RADIO_STATION_LIST["1LIVE"]="https://f141.rndfnk.com/ard/wdr/1live/live/mp3/128/stream.mp3"
 RADIO_STATION_LIST["Brainradio Klassik"]="http://brainradioklassik.stream.laut.fm/brainradioklassik"
+RADIO_STATION_LIST["Lounge Radio"]="https://stream.laut.fm/loungeradio"
 RADIO_STATION_LIST["Radio Swiss Jazz"]="http://www.radioswissjazz.ch/live/mp3.m3u"
 RADIO_STATION_LIST["Soul Radio"]="http://soulradio02.live-streams.nl:80/live"
+RADIO_STATION_LIST["The Summit FM"]="http://streamer2.legatocommunications.com/wapshq"
+RADIO_STATION_LIST["WBGO"]="https://wbgo.streamguys1.com/wbgo128"
+RADIO_STATION_LIST["WDR 2"]="https://wdr-edge-10c2-dus-dtag-cdn.cast.addradio.de/wdr/wdr2/rheinland/mp3/128/stream.mp3"
+RADIO_STATION_LIST["WSM AM"]="https://stream01048.westreamradio.com/wsm-am-mp3"
+RADIO_STATION_LIST["WXPN 88.5"]="https://wxpnhi.xpn.org/xpnhi"
 RADIO_STATION_LIST["fip Radio"]="http://direct.fipradio.fr/live/fip-midfi.mp3"
 
 AUDIO_SRC_FALLBACK="/home/sflip/snd/Mark Ronson feat. Bruno Mars - Uptown Funk.mp3"
@@ -144,7 +151,10 @@ function _test_audio_stream_url() {
     local URL="$1"
     # unfortunately doesn't work for some stations
     STATION_WHITELIST=(
+        "${RADIO_STATION_LIST["Lounge Radio"]}"
         "${RADIO_STATION_LIST["Radio Swiss Jazz"]}"
+        "${RADIO_STATION_LIST["WBGO"]}"
+        "${RADIO_STATION_LIST["WSM AM"]}"
         "${RADIO_STATION_LIST["fip Radio"]}"
     )
     # 'array contains'
