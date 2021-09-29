@@ -14,6 +14,7 @@ It offers a bash script for command line usage and a PHP/JS frontend for the web
 * Clone this repository
 * Configure [radio.sh](./radio.sh) to your needs:
     * Extend $RADIO_STATION_LIST
+    * Set $VLC_GAIN to a value that fits your needs
     * Set (fallback) $ALSA_DEVICE
 * Configure [frontend](./fontend/index.php):
     * Set PATH_TO_RADIO_SCRIPT to correct script path of `radio.sh`
