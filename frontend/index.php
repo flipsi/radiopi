@@ -152,7 +152,7 @@ header("Expires: 0"); // Proxies.
         ?>
 
             <h1>
-                Choose a station:
+                Radio stations:
             </h1>
                 <?php if ($radio_station_list_exit_code > 0 || sizeof($radio_station_list) === 0) {
                     echo "Sorry, could not get any station.";
