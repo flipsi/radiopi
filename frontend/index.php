@@ -1,6 +1,6 @@
 <?php
 
-define("PATH_TO_RADIO_SCRIPT", "/home/sflip/bin/radio.sh");
+define("PATH_TO_RADIO_SCRIPT", "/home/sflip/bin/radio");
 
 
 // NOTE that the webserver user needs permissions to access audio, e.g. on Arch Linux be part of the `audio` group.
@@ -34,16 +34,16 @@ if (!empty($_POST['action'])) {
     switch ($_POST['action']) {
         case 'start_playback':
             $station = $_POST['station'];
-            exec_radio_script("--non-interactive --detach '$station' >/dev/null", $action_output, $action_exit_code);
+            exec_radio_script("--non-interactive start '$station' >/dev/null", $action_output, $action_exit_code);
             break;
         case 'stop_playback':
-            exec_radio_script('--kill', $action_output, $action_exit_code);
+            exec_radio_script('stop', $action_output, $action_exit_code);
             break;
         case 'volume_down':
-            exec_radio_script("--volume -$volume_step >/dev/null", $action_output, $action_exit_code);
+            exec_radio_script("volume -$volume_step >/dev/null", $action_output, $action_exit_code);
             break;
         case 'volume_up':
-            exec_radio_script("--volume +$volume_step >/dev/null", $action_output, $action_exit_code);
+            exec_radio_script("volume +$volume_step >/dev/null", $action_output, $action_exit_code);
             break;
         default:
     }
@@ -81,7 +81,7 @@ header("Expires: 0"); // Proxies.
 
         <?php
 
-            exec_radio_script(' --status', $radio_status, $radio_status_exit_code);
+            exec_radio_script('status', $radio_status, $radio_status_exit_code);
 
             if ($radio_status_exit_code === 0) {
 
@@ -137,7 +137,7 @@ header("Expires: 0"); // Proxies.
 
             } else {
 
-                exec_radio_script(' --list', $radio_station_list, $radio_station_list_exit_code);
+                exec_radio_script('list', $radio_station_list, $radio_station_list_exit_code);
 
         ?>
 
