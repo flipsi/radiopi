@@ -77,6 +77,7 @@ ALSA_DEVICE="${ALSA_DEVICE:-plughw:CARD=sndrpihifiberry,DEV=0}"
 VLC_GAIN=0.3
 
 VLC_RC_HOST=localhost
+VLC_RC_PORT=9592 # hardcoded because using lsof (_find_unused_port) may be problematic
 
 STATEDIR=/tmp/radiopi
 PIDFILE="$STATEDIR/vlc.pid"
@@ -199,12 +200,12 @@ function _pick_station_interactively() {
 function _start_playback() {
     local TITLE="$1"
     local AUDIO_SRC="$2"
-    local VLC_RC_PORT
+    # local VLC_RC_PORT
     if ! _test_audio_stream_url "$AUDIO_SRC"; then
         echo "ERROR: $AUDIO_SRC does not look like an audio source."
         exit 2
     fi
-    VLC_RC_PORT=$(_find_unused_port)
+    # VLC_RC_PORT=$(_find_unused_port) # using lsof may be problematic (e.g. for webserver users)
     echo "$VLC_RC_PORT" > "$PORTFILE"
     if aplay -L | grep -q "$ALSA_DEVICE"; then
         # echo "Using device $ALSA_DEVICE"
