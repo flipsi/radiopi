@@ -66,11 +66,12 @@ header("Expires: 0"); // Proxies.
 
         <link rel="icon" type="image/png" href="radio-icon.png"/>
 
-
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Krona+One&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="./style.css">
+
+        <script type="text/javascript" src="./main.js"></script>
 
         <title>radiopi</title>
 
@@ -144,22 +145,23 @@ header("Expires: 0"); // Proxies.
             <h1>
                 Choose a station:
             </h1>
-            <ul id='stationlist'>
                 <?php if ($radio_station_list_exit_code > 0 || sizeof($radio_station_list) === 0) {
                     echo "Sorry, could not get any station.";
                 } else { ?>
+                    <input type="text" id="stationfilter" name="filter" placeholder="Search" />
                     <form name="start_playback_form" action="" method="post">
                         <input type="hidden" name="action" value="start_playback" />
                         <input type="hidden" name="station" />
+                        <ul id='stationlist'>
                         <?php foreach ($radio_station_list as $station) { ?>
                         <li class="touchable" onClick="document.forms['start_playback_form'].station.value = '<?php echo $station; ?>'; document.forms['start_playback_form'].submit();">
                             <span class="material-icons">play_circle_outline</span>
-                            <?php echo $station; ?>
+                            <span class="title"><?php echo $station; ?></span>
                         </li>
                         <?php } ?>
+                        </ul>
                         </form>
                 <?php } ?>
-            </ul>
 
         <?php
 

@@ -33,6 +33,7 @@ h1 {
 
 main {
   font-size: 1.1em;
+  margin-bottom: 80px;
 }
 
 
@@ -62,6 +63,13 @@ main {
 }
 #stationlist .material-icons {
     margin-right: 15px;
+}
+
+#stationfilter {
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 1.1em;
+  min-width: 18em;
 }
 
 footer {
