@@ -147,9 +147,15 @@ header("Expires: 0"); // Proxies.
         ?>
 
             <div class="block radiostatus">
-                Currently playing
-                <?php echo $radio_status['Station']; ?>
-                ...
+                Currently playing:
+                <div class="title"><?php echo $radio_status['Station']; ?></div>
+            </div>
+            <div class="block equaliser-container">
+            <?php for ($i = 0; $i < 9; $i++) { ?>
+                <ol class="equaliser-column">
+                    <li class="colour-bar"></li>
+                </ol>
+            <?php } ?>
             </div>
             <div class="block radiocontrols">
                 <form name="stop_playback_form" action="" method="post">
@@ -176,18 +182,6 @@ header("Expires: 0"); // Proxies.
                         up
                     </span>
                 </form>
-                </form>
-            </div>
-            <div class="block equaliser-container">
-            <?php
-                for ($i = 0; $i < 5; $i++) {
-                    echo '
-                        <ol class="equaliser-column">
-                            <li class="colour-bar"></li>
-                        </ol>
-                    ';
-                }
-            ?>
             </div>
 
         <?php
@@ -205,8 +199,8 @@ header("Expires: 0"); // Proxies.
                 <?php if ($radio_station_list_exit_code > 0 || sizeof($radio_station_list) === 0) {
                     echo "Sorry, could not get any station.";
                 } else { ?>
-                    <input type="text" id="stationfilter" name="filter" placeholder="Search" />
                     <form name="start_playback_form" action="" method="post">
+                        <input type="text" id="stationfilter" name="filter" placeholder="Search" />
                         <input type="hidden" name="action" value="start_playback" />
                         <input type="hidden" name="station" />
                         <ul id='stationlist'>
@@ -217,7 +211,7 @@ header("Expires: 0"); // Proxies.
                         </li>
                         <?php } ?>
                         </ul>
-                        </form>
+                    </form>
                 <?php } ?>
             </div>
         <?php
@@ -249,11 +243,9 @@ header("Expires: 0"); // Proxies.
             </div>
             <div class="block">
                 <label for="alarmtime">Set alarm to</label>
-                <input type="time" id="alarmtime" name="alarmtime" value="08:00" />
-            </div>
-            <div class="block">
                 <input type="hidden" name="action" value="enable_alarm" />
-                <input type="submit" value="Schedule alarm" />
+                <input type="time" id="alarmtime" name="alarmtime" value="08:00" />
+                <input type="submit" value="Save" />
             </div>
 
         <?php } ?>

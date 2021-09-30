@@ -29,8 +29,14 @@ h1 {
 }
 
 input {
-  border-radius: 6px;
+  box-sizing: border-box;
+  min-height: 35px;
   padding: 6px 10px;
+  margin-right: 10px;
+  border-radius: 6px;
+  border-style: double;
+  font-family: 'Krona One', Arial, sans-serif;
+  font-size: 10px;'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .inline {
@@ -84,10 +90,6 @@ main > .module.active {
   font-size: 48px;
 }
 
-.radiostatus {
-  margin: 30px 0 30px 0;
-}
-
 .radiocontrols {
   margin-bottom: 20px;
 }
@@ -106,8 +108,19 @@ main > .module.active {
   min-width: 18em;
 }
 
+.radiostatus {
+  font-size: 1.2em;
+  line-height: 1.8;
+}
+.radiostatus .title {
+  font-size: 1.5em;
+}
 .module.alarm .status {
   font-size: 1.5em;
+}
+
+#alarmtime {
+  margin-left: 10px;
 }
 
 footer {
@@ -165,6 +178,18 @@ footer {
 
 .equaliser-column:nth-child(5) .colour-bar {
     animation: color-bar 2s 2s ease-out alternate infinite;
+}
+.equaliser-column:nth-child(6) .colour-bar {
+    animation: color-bar 2s 0.9s ease-out alternate infinite;
+}
+.equaliser-column:nth-child(7) .colour-bar {
+    animation: color-bar 2s 0.8s ease-out alternate infinite;
+}
+.equaliser-column:nth-child(8) .colour-bar {
+    animation: color-bar 2s 2.2s ease-out alternate infinite;
+}
+.equaliser-column:nth-child(9) .colour-bar {
+    animation: color-bar 2s 1.4s ease-out alternate infinite;
 }
 
 .equaliser-column:last-child {
