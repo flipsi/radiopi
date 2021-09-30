@@ -14,11 +14,13 @@ It offers a bash script for command line usage and a PHP/JS frontend for the web
 * Clone this repository
 * Configure [radio.sh](./radio.sh) to your needs:
     * Extend $RADIO_STATION_LIST
-    * Set $VLC_GAIN to a value that fits your needs
+    * Adjust $VLC_GAIN
     * Set (fallback) $ALSA_DEVICE
 * Configure [frontend](./fontend/index.php):
     * Set PATH_TO_RADIO_SCRIPT to correct script path of `radio.sh`
 * Configure webserver to be able to access system audio (i.e. add webserver user to `audio` group)
+* If you want to use the scheduled alarm feature, install a cron service and create a crontab for
+    the webserver user.
 * Symlink [the frontend](./fontend/) to your webserver's document root
 
 

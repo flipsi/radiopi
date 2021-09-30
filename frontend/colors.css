@@ -1,0 +1,37 @@
+body {
+  color: #ddd;
+  background-color: #222;
+}
+
+h1,
+.radiostatus,
+.module.alarm .status {
+  color: #888;
+}
+
+input {
+  background-color: #ddd;
+  color: #222;
+}
+
+nav {
+  background-color: #333;
+}
+
+.navlink.active {
+  background-color: #222;
+}
+
+footer em {
+  color: #A42;
+}
+
+.playbackbutton,
+.module.alarm .status .time {
+  color: #A42;
+}
+
+.errors {
+  color: #911;
+  background-color: #ddd;
+}
