@@ -70,7 +70,14 @@ if (!empty($_POST['action'])) {
             break;
         default:
     }
+    // prevent form resubmission with PRG pattern
+    if (empty($errors)) {
+        unset($_POST);
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
 }
+
 
 exec_radio_script('status', $radio_status_output, $radio_status_exit_code);
 $radio_status = parse_radio_status($radio_status_output);
