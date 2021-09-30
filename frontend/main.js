@@ -48,7 +48,9 @@ document.addEventListener("DOMContentLoaded", function(){
       link.addEventListener('click', e => {
         const title = link.getElementsByClassName('title')[0].innerText;
         stationInput.value = title;
-        startPlaybackForm.submit();
+        if (!startPlaybackForm.classList.contains('pending'))
+          startPlaybackForm.submit();
+        startPlaybackForm.classList.add('pending');
       });
     }
   }
@@ -59,7 +61,9 @@ document.addEventListener("DOMContentLoaded", function(){
       const thing = things[i];
       const form = thing.closest('form');
       thing.addEventListener('click', e => {
-        form.submit();
+        if (!form.classList.contains('pending'))
+          form.submit();
+        form.classList.add('pending');
       });
     }
   }
