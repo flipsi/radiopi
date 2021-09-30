@@ -160,7 +160,7 @@ header("Expires: 0"); // Proxies.
             <div class="block radiocontrols">
                 <form name="stop_playback_form" action="" method="post">
                     <input type="hidden" name="action" value="stop_playback" />
-                    <div class="touchable" onClick="document.forms['stop_playback_form'].submit();;">
+                    <div class="submit">
                         <span class="material-icons playbackbutton">stop</span>
                         Stop playback
                     </div>
@@ -170,14 +170,14 @@ header("Expires: 0"); // Proxies.
                 Volume:
                 <form class="inline" name="volume_down_form" action="" method="post">
                     <input type="hidden" name="action" value="volume_down" />
-                    <span class="touchable" onClick="document.forms['volume_down_form'].submit();;">
+                    <span class="submit">
                         <span class="material-icons playbackbutton">volume_down</span>
                         down
                     </span>
                 </form>
                 <form class="inline" name="volume_up_form" action="" method="post">
                     <input type="hidden" name="action" value="volume_up" />
-                    <span class="touchable" onClick="document.forms['volume_up_form'].submit();;">
+                    <span class="submit">
                         <span class="material-icons playbackbutton">volume_up</span>
                         up
                     </span>
@@ -200,12 +200,12 @@ header("Expires: 0"); // Proxies.
                     echo "Sorry, could not get any station.";
                 } else { ?>
                     <form name="start_playback_form" action="" method="post">
-                        <input type="text" id="stationfilter" name="filter" placeholder="Search" />
+                        <input type="text" name="filter" id="stationfilter" placeholder="Search" />
                         <input type="hidden" name="action" value="start_playback" />
-                        <input type="hidden" name="station" />
+                        <input type="hidden" name="station" id="stationinput" />
                         <ul id='stationlist'>
                         <?php foreach ($radio_station_list as $station) { ?>
-                        <li class="touchable" onClick="document.forms['start_playback_form'].station.value = '<?php echo $station; ?>'; document.forms['start_playback_form'].submit();">
+                        <li class="stationlink">
                             <span class="material-icons playbackbutton">play_circle_outline</span>
                             <span class="title"><?php echo $station; ?></span>
                         </li>

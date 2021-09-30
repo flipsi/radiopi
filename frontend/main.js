@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 
   function addStationFilterEventHandler() {
-
     const stationfilter = document.getElementById('stationfilter');
     const stationlist = document.getElementById('stationlist');
 
@@ -31,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function(){
       stationfilter.addEventListener('input', e => {
         const searchString = e.target.value.toLowerCase();
         for (let i = 0; i < stationlist.children.length; i++) {
-          const station = stationlist.children[i]
+          const station = stationlist.children[i];
           const title = station.getElementsByClassName('title')[0].innerHTML.toLowerCase();
           station.style.display = title.match(searchString) ? 'block' : 'none';
         }
@@ -40,7 +39,34 @@ document.addEventListener("DOMContentLoaded", function(){
 
   };
 
+  function addStationLinkEventHandler() {
+    const startPlaybackForm = document.forms['start_playback_form'];
+    const stationInput = document.getElementById('stationinput');
+    const stationLinks = document.getElementsByClassName('stationlink');
+    for (let i = 0; i < stationLinks.length; i++) {
+      const link = stationLinks[i];
+      link.addEventListener('click', e => {
+        const title = link.getElementsByClassName('title')[0].innerText;
+        stationInput.value = title;
+        startPlaybackForm.submit();
+      });
+    }
+  }
+
+  function addSubmitEventHandlers() {
+    const things = document.getElementsByClassName('submit');
+    for (let i = 0; i < things.length; i++) {
+      const thing = things[i];
+      const form = thing.closest('form');
+      thing.addEventListener('click', e => {
+        form.submit();
+      });
+    }
+  }
+
   addStationFilterEventHandler();
   addNavigationEventHandler();
+  addStationLinkEventHandler();
+  addSubmitEventHandlers();
 
 });
