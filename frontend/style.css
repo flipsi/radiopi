@@ -5,10 +5,11 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  overflow: hidden; /* make browser scrollbar disappear */
 }
 
 body {
+  display: flex; /* This is important for the footer to stay at the bottom */
+  flex-direction: column;
   font-family: 'Krona One', Arial, sans-serif;
   font-size: 14px;'Helvetica Neue', Helvetica, Arial, sans-serif;
   line-height: 1.4em;
@@ -70,7 +71,7 @@ nav {
 
 main {
   padding: 10px;
-  margin-bottom: 80px;
+  margin-bottom: 30px;
 }
 
 main > .module {
@@ -124,10 +125,10 @@ main > .module.active {
 }
 
 footer {
-  padding: 10px;
   position: absolute;
-  bottom: 30px;
+  bottom: 10px;
   right: 0;
+  padding: 10px;
 }
 
 
