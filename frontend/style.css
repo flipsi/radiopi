@@ -40,6 +40,12 @@ input {
   font-size: 10px;'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+input[type='submit']:hover,
+.submit:hover,
+.stationlink:hover {
+  cursor: pointer;
+}
+
 .inline {
   display: inline
 }
