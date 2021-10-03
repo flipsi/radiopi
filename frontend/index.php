@@ -60,10 +60,12 @@ if (!empty($_POST['action'])) {
             exec_radio_script("volume +$volume_step >/dev/null", $action_output, $action_exit_code);
             break;
         case 'enable_alarm':
-            preg_match('/(\d\d):(\d\d)/', $_POST['alarmtime'], $matches);
-            $hour = $matches[1];
-            $minute = $matches[2];
-            exec_radio_script("enable $hour $minute", $action_output, $action_exit_code);
+            preg_match('/(\d\d):(\d\d)/', $_POST['alarmtime'], $alarmtime_matches);
+            preg_match('/(\d+)/', $_POST['alarmduration'], $alarmduration_matches);
+            $hour = $alarmtime_matches[1];
+            $minute = $alarmtime_matches[2];
+            $duration = $alarmduration_matches[1];
+            exec_radio_script("enable $hour $minute $duration", $action_output, $action_exit_code);
             break;
         case 'disable_alarm':
             exec_radio_script("disable", $action_output, $action_exit_code);
@@ -245,6 +247,10 @@ header("Expires: 0"); // Proxies.
                 <label for="alarmtime">Alarm time:</label>
                 <input type="hidden" name="action" value="enable_alarm" />
                 <input type="time" id="alarmtime" name="alarmtime" value="08:00" />
+            </div>
+            <div class="block">
+                <label for="alarmduration">Duration in minutes:</label>
+                <input type="number" min="1" max="150" id="alarmduration" name="alarmduration" value="60" />
             </div>
             <div class="block">
                 <input type="submit" value="Save" />
