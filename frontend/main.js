@@ -2,23 +2,38 @@ document.addEventListener("DOMContentLoaded", function(){
 
   const active = 'active';
 
-  function addNavigationEventHandler() {
-    const navlinkRadio = document.querySelector('.navlink.radio');
-    const navlinkAlarm = document.querySelector('.navlink.alarm');
-    const moduleRadio = document.querySelector('.module.radio');
-    const moduleAlarm = document.querySelector('.module.alarm');
+  const navlinkRadio = document.querySelector('.navlink.radio');
+  const navlinkAlarm = document.querySelector('.navlink.alarm');
+  const moduleRadio = document.querySelector('.module.radio');
+  const moduleAlarm = document.querySelector('.module.alarm');
 
+  function showModule(moduleName) {
+    switch (moduleName) {
+      case 'radio':
+        navlinkRadio.classList.add(active);
+        navlinkAlarm.classList.remove(active);
+        moduleRadio.classList.add(active);
+        moduleAlarm.classList.remove(active);
+        break;
+      case 'alarm':
+        navlinkRadio.classList.remove(active);
+        navlinkAlarm.classList.add(active);
+        moduleRadio.classList.remove(active);
+        moduleAlarm.classList.add(active);
+        break;
+      default:
+        console.error('Unknown module', moduleName);
+    }
+  }
+
+  function addNavigationEventHandler() {
     navlinkRadio.addEventListener('click', e => {
-      navlinkRadio.classList.add(active);
-      navlinkAlarm.classList.remove(active);
-      moduleRadio.classList.add(active);
-      moduleAlarm.classList.remove(active);
+      showModule('radio');
+      window.location.hash = 'radio';
     });
     navlinkAlarm.addEventListener('click', e => {
-      navlinkRadio.classList.remove(active);
-      navlinkAlarm.classList.add(active);
-      moduleRadio.classList.remove(active);
-      moduleAlarm.classList.add(active);
+      showModule('alarm');
+      window.location.hash = 'alarm';
     });
   }
 
@@ -72,5 +87,8 @@ document.addEventListener("DOMContentLoaded", function(){
   addNavigationEventHandler();
   addStationLinkEventHandler();
   addSubmitEventHandlers();
+
+  if (window.location.hash)
+    showModule(window.location.hash.substr(1));
 
 });
