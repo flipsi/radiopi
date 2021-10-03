@@ -251,6 +251,7 @@ header("Expires: 0"); // Proxies.
         <?php } ?>
 
             <div class="block">
+                The alarm will start at low volume, which will increase over time.
                 The alarm will start with a random radio station. Picking a certain one is currently not supported.
             </div>
 
