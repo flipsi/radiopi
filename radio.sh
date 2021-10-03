@@ -87,7 +87,7 @@ VOLUME_INCREMENT_COUNT=15
 VOLUME_INCREMENT_FREQUENCY=$((60 * 2))
 VOLUME_INCREMENT_AMOUNT=5
 
-VLC_GAIN=0.3
+VLC_GAIN=${VLC_GAIN:-0.9}
 
 VLC_RC_HOST=localhost
 VLC_RC_PORT=9592 # hardcoded because using lsof (_find_unused_port) may be problematic
