@@ -36,10 +36,12 @@ input {
   margin-right: 10px;
   border-radius: 6px;
   border-style: double;
-  font-family: 'Krona One', Arial, sans-serif;
-  font-size: 10px;'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Krona One', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.1em;
 }
-
+input[type='submit'] {
+  margin-bottom: 15px;
+}
 input[type='submit']:hover,
 .submit:hover,
 .stationlink:hover {
@@ -89,7 +91,7 @@ main > .module.active {
 
 .block {
   margin-top: 6px;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .material-icons {
@@ -111,18 +113,16 @@ main > .module.active {
 }
 
 #stationfilter {
-  font-size: 1.1em;
   min-width: 18em;
 }
 
-.radiostatus {
+.radiostatus,
+.module.alarm .status,
+input[type='submit'] {
   font-size: 1.2em;
   line-height: 1.8;
 }
 .radiostatus .title {
-  font-size: 1.5em;
-}
-.module.alarm .status {
   font-size: 1.5em;
 }
 

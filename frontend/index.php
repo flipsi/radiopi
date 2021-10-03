@@ -192,9 +192,9 @@ header("Expires: 0"); // Proxies.
 
         ?>
 
-            <h1>
+            <div class="block radiostatus">
                 Radio stations:
-            </h1>
+            </div>
             <div class="block">
                 <?php if ($radio_station_list_exit_code > 0 || sizeof($radio_station_list) === 0) {
                     echo "Sorry, could not get any station.";
@@ -242,17 +242,22 @@ header("Expires: 0"); // Proxies.
                 Alarm is disabled.
             </div>
             <div class="block">
-                <label for="alarmtime">Set alarm to</label>
+                <label for="alarmtime">Alarm time:</label>
                 <input type="hidden" name="action" value="enable_alarm" />
                 <input type="time" id="alarmtime" name="alarmtime" value="08:00" />
+            </div>
+            <div class="block">
                 <input type="submit" value="Save" />
             </div>
 
         <?php } ?>
 
             <div class="block">
+                <p>
                 The alarm will start at low volume, which will increase over time.
+                </p><p>
                 The alarm will start with a random radio station. Picking a certain one is currently not supported.
+                </p>
             </div>
 
         </form>
