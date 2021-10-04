@@ -101,6 +101,7 @@ PIDFILE_INC="$STATEDIR/volume_increment.pid"
 PORTFILE="$STATEDIR/vlc.port"
 VOLUMEFILE="$STATEDIR/vlc.volume"
 STATUSFILE="$STATEDIR/status.txt"
+TMP_CRONTAB_FILE="$STATEDIR/crontab.txt"
 
 
 function _is_raspberry_pi() {
@@ -396,19 +397,18 @@ function _open_crontab() {
         echo "ERROR: You don't have a crontab file yet. Create one with \`crontab -e\`."
         exit 1
     fi
-    TMP_CRONTAB=$(mktemp "$STATEDIR/crontab.XXX.txt")
-    crontab -l > "$TMP_CRONTAB"
+    crontab -l > "$TMP_CRONTAB_FILE"
 }
 
 function _close_crontab() {
-    # cat "$TMP_CRONTAB" # debug
-    crontab < "$TMP_CRONTAB"
+    # cat "$TMP_CRONTAB_FILE" # debug
+    crontab < "$TMP_CRONTAB_FILE"
 }
 
 function _echo_alarm_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
-        TIME=$(awk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB")
+        TIME=$(awk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
         if [[ -n "$TIME" ]]; then
             echo "Alarm: enabled"
             echo "Alarm time: $TIME"
@@ -430,12 +430,12 @@ function _enable_alarm() {
     OMEGA_MINUTE=$(date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%M')
     _open_crontab
     _disable_alarm_inner
-    _append_once "$TMP_CRONTAB" "ALARM_CMD=$DIR/$SELF"
-    _append_once "$TMP_CRONTAB" "ALARM_LOG=$STATEDIR/alarm.log"
+    _append_once "$TMP_CRONTAB_FILE" "ALARM_CMD=$DIR/$SELF"
+    _append_once "$TMP_CRONTAB_FILE" "ALARM_LOG=$STATEDIR/alarm.log"
     ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * * \$ALARM_CMD start -r -w >>\$ALARM_LOG 2>&1 # $ALARM_CRON_ID"
     OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * * \$ALARM_CMD stop        >>\$ALARM_LOG 2>&1 # $ALARM_CRON_ID"
-    _append_once "$TMP_CRONTAB" "$ALPHA_LINE"
-    _append_once "$TMP_CRONTAB" "$OMEGA_LINE"
+    _append_once "$TMP_CRONTAB_FILE" "$ALPHA_LINE"
+    _append_once "$TMP_CRONTAB_FILE" "$OMEGA_LINE"
     _close_crontab
     echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE."
     if ! pgrep crond; then
@@ -451,12 +451,13 @@ function _disable_alarm() {
 }
 
 function _disable_alarm_inner() {
-    awk -i inplace -v rmv="$ALARM_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB"
+    awk -i inplace -v rmv="$ALARM_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
 }
 
 function _main() {
 
     mkdir -p "$STATEDIR"
+    chmod 777 "$STATEDIR"
 
     if _is_raspberry_pi; then
         _verify_vlc_volume_is_decoupled_from_system_volume

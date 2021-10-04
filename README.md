@@ -19,8 +19,9 @@ It offers a bash script for command line usage and a PHP/JS frontend for the web
 * Configure [frontend](./fontend/index.php):
     * Set PATH_TO_RADIO_SCRIPT to correct script path of `radio.sh`
 * Configure webserver to be able to access system audio (i.e. add webserver user to `audio` group)
-* If you want to use the scheduled alarm feature, install a cron service and create a crontab for
-    the webserver user.
+* If you want to use the scheduled alarm feature:
+    * Install a cron service and create a crontab for the webserver user
+    * In systemd, disable the [private tmp directory][systemd-private-tmp] of the webserver
 * Symlink [the frontend](./fontend/) to your webserver's document root
 
 
@@ -39,3 +40,6 @@ Philipp Moers – [@soziflip](https://twitter.com/soziflip)
 ## License
 
 This software is provided under the [MIT license](LICENSE.md).
+
+
+[systemd-private-tmp] https://www.freedesktop.org/software/systemd/man/systemd.exec.html#PrivateTmp=
