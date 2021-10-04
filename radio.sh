@@ -6,6 +6,8 @@ set -e
 set -o pipefail
 set -m # enable job control (e.g. `fg` command)
 
+umask 000
+
 
 [ "${BASH_VERSINFO:-0}" -ge 4 ] || (echo "Bash version >= 4 required, sorry." && exit 1)
 
@@ -457,7 +459,6 @@ function _disable_alarm_inner() {
 function _main() {
 
     mkdir -p "$STATEDIR"
-    chmod 777 "$STATEDIR"
 
     if _is_raspberry_pi; then
         _verify_vlc_volume_is_decoupled_from_system_volume
