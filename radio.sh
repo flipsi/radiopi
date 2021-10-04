@@ -544,7 +544,12 @@ function _main() {
         esac
     done
 
-    _start_radio "$QUERY_OR_URL"
+    if _is_playing; then
+        echo "ERROR: Radio already playing."
+        exit 1
+    else
+        _start_radio "$QUERY_OR_URL"
+    fi
 
 }
 
