@@ -101,7 +101,7 @@ header("Expires: 0"); // Proxies.
 
         <link rel="manifest" href="radiopi.webmanifest">
 
-        <link rel="icon" type="image/png" href="radiopi-icon.png"/>
+        <link rel="icon" type="image/png" href="radiopi-icon-64.png"/>
 
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Krona+One&display=swap" rel="stylesheet">
@@ -274,7 +274,6 @@ header("Expires: 0"); // Proxies.
         </main>
 
         <footer>
-            <!-- TODO: add icon here? -->
             <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
             made by
             <a href="https://philippmoers.de">Flipsi</a>
