@@ -2,7 +2,7 @@ radiopi
 =======
 
 radiopi is a small utility to conveniently play some web radio, e.g. on a Raspberry Pi.
-It offers a bash script for command line usage and a PHP/JS frontend for the web.
+It offers a bash script for command line usage and a [Progressive Web App](https://de.wikipedia.org/wiki/Progressive_Web_App) as a frontend.
 
 ## Installation
 
@@ -29,7 +29,7 @@ It offers a bash script for command line usage and a PHP/JS frontend for the web
 
 For `radio.sh` command line usage, refer to the `--help`.
 
-For webserver usage, open the frontend in a browser and click buttons to start or stop the radio.
+Progressive web app usage should be self-explanatory once you opened the URL with a browser.
 
 
 ## Author
