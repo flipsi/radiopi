@@ -29,7 +29,7 @@
     }
   ],
   "id": "sflip/radiopi",
-  "start_url": "/",
+  "start_url": "/radio",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
