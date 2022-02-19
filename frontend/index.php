@@ -272,6 +272,7 @@ header("Expires: 0"); // Proxies.
         </main>
 
         <footer>
+            <!-- TODO: add icon here? -->
             <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
             made by
             <a href="https://philippmoers.de">Flipsi</a>
