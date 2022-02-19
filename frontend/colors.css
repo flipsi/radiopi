@@ -15,7 +15,7 @@ input {
 }
 
 input[type='submit'] {
-  background-color: #A42;
+  background-color: #D6264F;
   color: #ddd;
 }
 
@@ -29,10 +29,10 @@ nav {
 
 .playbackbutton,
 footer em {
-  color: #A42;
+  color: #D6264F;
 }
 .module.alarm input {
-  border-color: #A42;
+  border-color: #D6264F;
 }
 
 .radiostatus .title,
