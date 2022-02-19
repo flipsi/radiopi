@@ -99,6 +99,8 @@ header("Expires: 0"); // Proxies.
         <meta name="author" content="sflip">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+        <link rel="manifest" href="radiopi.webmanifest">
+
         <link rel="icon" type="image/png" href="radiopi-icon.png"/>
 
         <link rel="preconnect" href="https://fonts.gstatic.com">
