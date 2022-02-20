@@ -84,6 +84,8 @@ if (!empty($_POST['action'])) {
 exec_radio_script('status', $radio_status_output, $radio_status_exit_code);
 $radio_status = parse_radio_status($radio_status_output);
 
+$default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 'enabled' ? 'alarm' : 'radio';
+
 header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
 header("Pragma: no-cache"); // HTTP 1.0.
 header("Expires: 0"); // Proxies.
@@ -126,13 +128,13 @@ header("Expires: 0"); // Proxies.
         <?php } ?>
 
         <nav>
-            <span class="navlink radio active">
+            <span class="navlink radio <?php echo $default_module === 'radio' ? 'active' : ''; ?>">
                 <span class="material-icons">radio</span>
                 <div class="label">
                     Radio
                 </div>
             </span>
-            <span class="navlink alarm">
+            <span class="navlink alarm <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
                 <span class="material-icons">alarm</span>
                 <div class="label">
                     Alarm
@@ -142,7 +144,7 @@ header("Expires: 0"); // Proxies.
 
         <main>
 
-        <div class="module radio active">
+        <div class="module radio <?php echo $default_module === 'radio' ? 'active' : ''; ?>">
 
         <?php
 
@@ -226,7 +228,7 @@ header("Expires: 0"); // Proxies.
 
         </div>
 
-        <div class="module alarm">
+        <div class="module alarm <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
         <form name="alarm_form" action="" method="post">
 
         <?php if ($radio_status['Alarm'] === 'enabled') { ?>
