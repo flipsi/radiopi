@@ -35,6 +35,15 @@ footer em {
   border-color: #D6264F;
 }
 
+form.pending .playbackbutton {
+  color: #999;
+}
+form.pending input[type='submit'] {
+  background-color: #333;
+  border-color: #333;
+  color: #888;
+}
+
 .radiostatus .title,
 .module.alarm .status .time {
   color: #FFBC42;
