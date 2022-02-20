@@ -15,6 +15,7 @@ $logfile_handler = fopen(LOGFILE, 'a'); // 'a' means append mode
 
 $volume_step = 10;
 
+$hostname = gethostname();
 
 function write_log($log_msg) {
     global $logfile_handler;
@@ -277,6 +278,7 @@ header("Expires: 0"); // Proxies.
 
         <footer>
             <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
+            hosted on <em><?php echo $hostname; ?></em>
             made by
             <a href="https://philippmoers.de">Flipsi</a>
         </footer>
