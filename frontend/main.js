@@ -71,16 +71,20 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 
   function addSubmitEventHandlers() {
-    const things = document.getElementsByClassName('submit');
-    for (let i = 0; i < things.length; i++) {
-      const thing = things[i];
-      const form = thing.closest('form');
-      thing.addEventListener('click', e => {
-        if (!form.classList.contains('pending'))
-          form.submit();
-        form.classList.add('pending');
-      });
-    }
+    [
+      document.getElementsByClassName('submit'),
+      document.querySelectorAll('input[type=submit]'),
+    ].forEach(things => {
+      for (let i = 0; i < things.length; i++) {
+        const thing = things[i];
+        const form = thing.closest('form');
+        thing.addEventListener('click', e => {
+          if (!form.classList.contains('pending'))
+            form.submit();
+          form.classList.add('pending');
+        });
+      }
+    });
   }
 
   addStationFilterEventHandler();
