@@ -104,6 +104,7 @@ main > .module.active {
 }
 
 #stationlist {
+  margin-top: 22px;
   padding-left: 10px;
   list-style: none;
   line-height: 3em;
