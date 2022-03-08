@@ -42,4 +42,4 @@ Philipp Moers – [@soziflip](https://twitter.com/soziflip)
 This software is provided under the [MIT license](LICENSE.md).
 
 
-[systemd-private-tmp] https://www.freedesktop.org/software/systemd/man/systemd.exec.html#PrivateTmp=
+[systemd-private-tmp]: https://www.freedesktop.org/software/systemd/man/systemd.exec.html#PrivateTmp=
