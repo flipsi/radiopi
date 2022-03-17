@@ -161,6 +161,14 @@ function _test_audio_stream_url() {
     local URL="$1"
     # unfortunately doesn't work for some stations
     STATION_WHITELIST=(
+        "${RADIO_STATION_LIST["1LIVE"]}"
+        "${RADIO_STATION_LIST["1LIVE DIGGI"]}"
+        "${RADIO_STATION_LIST["WDR 2"]}"
+        "${RADIO_STATION_LIST["WDR 3"]}"
+        "${RADIO_STATION_LIST["WDR 4"]}"
+        "${RADIO_STATION_LIST["WDR 5"]}"
+        "${RADIO_STATION_LIST["Die Maus"]}"
+        "${RADIO_STATION_LIST["Linn Jazz"]}"
         "${RADIO_STATION_LIST["Lounge Radio"]}"
         "${RADIO_STATION_LIST["Radio Swiss Jazz"]}"
         "${RADIO_STATION_LIST["WBGO"]}"
