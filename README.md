@@ -32,6 +32,13 @@ For `radio.sh` command line usage, refer to the `--help`.
 Progressive web app usage should be self-explanatory once you opened the URL with a browser.
 
 
+## Radio Stream URLs
+
+You can find web radio stream URLs at these sites:
+* https://streamurl.link
+* https://www.radio-browser.info/
+
+
 ## Author
 
 Philipp Moers – [@soziflip](https://twitter.com/soziflip)
