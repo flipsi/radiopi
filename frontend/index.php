@@ -296,10 +296,14 @@ header("Expires: 0"); // Proxies.
         </main>
 
         <footer>
-            <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
-            hosted on <em><?php echo $hostname; ?></em>
-            made by
-            <a href="https://philippmoers.de">Flipsi</a>
+            <span>
+                <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
+                made by
+                <a href="https://philippmoers.de">Flipsi</a>
+            </span>
+            <span>
+                hosted on <em><?php echo $hostname; ?></em>
+            </span>
         </footer>
 
     </body>
