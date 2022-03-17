@@ -1,6 +1,15 @@
 <?php
 
+/////////////////////////////////////
+// CONFIGURATION BLOCK STARTS HERE //
+/////////////////////////////////////
+
+// Path to backend (radio.sh script)
 define("PATH_TO_RADIO_SCRIPT", "/home/sflip/bin/radio");
+
+// On some hosts, volume should be managed separately from this application.
+// This is especially relevant until https://github.com/sflip/radiopi/issues/2 is fixed.
+define("NO_VOLUME_HOSTS", ["idefix"]);
 
 
 // NOTE that the webserver user needs permissions to access audio, e.g. on Arch Linux be part of the `audio` group.
@@ -10,12 +19,20 @@ define("PATH_TO_RADIO_SCRIPT", "/home/sflip/bin/radio");
 // See https://stackoverflow.com/questions/55014399/why-doesnt-php-7-2-fopen-tmp-a-write-to-the-file/55016941#55016941
 define("LOGFILE", "/tmp/radiopi_frontend.log");
 
+$volume_step = 10;
+
+
+///////////////////////////////////
+// CONFIGURATION BLOCK ENDS HERE //
+///////////////////////////////////
+
 
 $logfile_handler = fopen(LOGFILE, 'a'); // 'a' means append mode
 
-$volume_step = 10;
-
 $hostname = gethostname();
+
+$hide_volume_controls = in_array($hostname, NO_VOLUME_HOSTS);
+
 
 function write_log($log_msg) {
     global $logfile_handler;
@@ -173,7 +190,7 @@ header("Expires: 0"); // Proxies.
                     </div>
                 </form>
             </div>
-            <div class="block radiocontrols">
+            <div class="block radiocontrols <?php echo $hide_volume_controls ? "hidden" : ""; ?>">
                 Volume:
                 <form class="inline" name="volume_down_form" action="" method="post">
                     <input type="hidden" name="action" value="volume_down" />

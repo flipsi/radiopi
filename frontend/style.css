@@ -104,6 +104,9 @@ main > .module.active {
 .radiocontrols {
   margin-bottom: 20px;
 }
+.radiocontrols.hidden {
+  display: none;
+}
 
 #stationlist {
   margin-top: 22px;

@@ -18,6 +18,7 @@ It offers a bash script for command line usage and a [Progressive Web App](https
     * Set (fallback) $ALSA_DEVICE
 * Configure [frontend](./fontend/index.php):
     * Set PATH_TO_RADIO_SCRIPT to correct script path of `radio.sh`
+    * Set NO_VOLUME_HOSTS if you want to disable volumen controls
 * Configure webserver to be able to access system audio (i.e. add webserver user to `audio` group)
 * If you want to use the scheduled alarm feature:
     * Install a cron service and create a crontab for the webserver user
