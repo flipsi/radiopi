@@ -35,6 +35,43 @@ document.addEventListener("DOMContentLoaded", function(){
       showModule('alarm');
       window.location.hash = 'alarm';
     });
+
+    onSwipeLeft = () => showModule('alarm');
+    onSwipeRight = () => showModule('radio');
+
+    // detect swipe gestures
+    (() => {
+      const slideArea = document.body;
+      let touchstart = { x: 0, y: 0};
+      let touchend = { x: 0, y: 0};
+
+      handleGesture = () => {
+        const distanceX = Math.abs(touchstart.x - touchend.x);
+        const distanceY = Math.abs(touchstart.y - touchend.y);
+        const horizontal = distanceX > distanceY;
+        const left = horizontal && touchend.x < touchstart.x;
+        const right = horizontal && touchend.x > touchstart.x;
+        if (left && typeof onSwipeLeft == 'function') onSwipeLeft();
+        if (right && typeof onSwipeRight == 'function') onSwipeRight();
+      };
+
+      slideArea.addEventListener('touchstart', e => {
+        touchstart = {
+          x: e.changedTouches[0].screenX,
+          y: e.changedTouches[0].screenY
+        };
+      })
+
+      slideArea.addEventListener('touchend', e => {
+        touchend = {
+          x: e.changedTouches[0].screenX,
+          y: e.changedTouches[0].screenY
+        };
+        handleGesture();
+      })
+
+    })();
+
   }
 
   function addStationFilterEventHandler() {
