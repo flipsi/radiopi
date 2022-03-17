@@ -42,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function(){
     const stationlist = document.getElementById('stationlist');
 
     if (stationfilter && stationlist) {
+
+      // filter station list as user types
       stationfilter.addEventListener('input', e => {
         const searchString = e.target.value.toLowerCase();
         for (let i = 0; i < stationlist.children.length; i++) {
@@ -50,6 +52,14 @@ document.addEventListener("DOMContentLoaded", function(){
           station.style.display = title.match(searchString) ? 'block' : 'none';
         }
       });
+
+      // clear focus (to close virtual keyboard) when user is done searching and hits enter
+      stationfilter.addEventListener('keyup', e => {
+        if (e.key == 'Enter') {
+          stationfilter.blur();
+        }
+      });
+
     }
 
   };
