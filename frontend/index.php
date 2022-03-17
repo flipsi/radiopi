@@ -206,8 +206,10 @@ header("Expires: 0"); // Proxies.
                 <?php if ($radio_station_list_exit_code > 0 || sizeof($radio_station_list) === 0) {
                     echo "Sorry, could not get any station.";
                 } else { ?>
-                    <form name="start_playback_form" action="" method="post">
+                    <form onsubmit="return false;">
                         <input type="text" name="filter" id="stationfilter" placeholder="Search" />
+                    </form>
+                    <form name="start_playback_form" action="" method="post">
                         <input type="hidden" name="action" value="start_playback" />
                         <input type="hidden" name="station" id="stationinput" />
                         <ul id='stationlist'>
