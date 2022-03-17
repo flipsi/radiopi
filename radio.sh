@@ -64,14 +64,20 @@ require nc
 
 
 declare -A RADIO_STATION_LIST
-RADIO_STATION_LIST["1LIVE"]="https://f141.rndfnk.com/ard/wdr/1live/live/mp3/128/stream.mp3"
+RADIO_STATION_LIST["1LIVE"]="http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3"
+RADIO_STATION_LIST["1LIVE DIGGI"]="http://wdr-1live-diggi.icecast.wdr.de/wdr/1live/diggi/mp3/128/stream.mp3"
+RADIO_STATION_LIST["WDR 2"]="http://wdr-wdr2-rheinland.icecast.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3"
+RADIO_STATION_LIST["WDR 3"]="http://wdr-wdr3-live.icecast.wdr.de/wdr/wdr3/live/mp3/256/stream.mp3"
+RADIO_STATION_LIST["WDR 4"]="http://wdr-wdr4-live.icecast.wdr.de/wdr/wdr4/live/mp3/128/stream.mp3"
+RADIO_STATION_LIST["WDR 5"]="http://wdr-wdr5-live.icecast.wdr.de/wdr/wdr5/live/mp3/128/stream.mp3"
+RADIO_STATION_LIST["Die Maus"]="https://wdr-diemaus-live.icecastssl.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3"
 RADIO_STATION_LIST["Brainradio Klassik"]="http://brainradioklassik.stream.laut.fm/brainradioklassik"
-RADIO_STATION_LIST["Lounge Radio"]="https://stream.laut.fm/loungeradio"
+RADIO_STATION_LIST["Linn Jazz"]="http://radio.linn.co.uk:8000/autodj"
 RADIO_STATION_LIST["Radio Swiss Jazz"]="http://www.radioswissjazz.ch/live/mp3.m3u"
+RADIO_STATION_LIST["Lounge Radio"]="https://stream.laut.fm/loungeradio"
 RADIO_STATION_LIST["Soul Radio"]="http://soulradio02.live-streams.nl:80/live"
 RADIO_STATION_LIST["The Summit FM"]="http://streamer2.legatocommunications.com/wapshq"
 RADIO_STATION_LIST["WBGO"]="https://wbgo.streamguys1.com/wbgo128"
-RADIO_STATION_LIST["WDR 2"]="https://wdr-edge-10c2-dus-dtag-cdn.cast.addradio.de/wdr/wdr2/rheinland/mp3/128/stream.mp3"
 RADIO_STATION_LIST["WSM AM"]="https://stream01048.westreamradio.com/wsm-am-mp3"
 RADIO_STATION_LIST["WXPN 88.5"]="https://wxpnhi.xpn.org/xpnhi"
 RADIO_STATION_LIST["fip Radio"]="http://direct.fipradio.fr/live/fip-midfi.mp3"
@@ -204,6 +210,7 @@ function _configure_vlc_netcat_cmd() {
             exit 1
         fi
     fi
+    echo VLC_NETCAT_CMD is "$VLC_NETCAT_CMD"
 }
 
 # TODO: debug.
@@ -289,7 +296,7 @@ function _start_playback() {
         "${VLC_OUTPUT_ARGS[@]}" \
         --gain="$VLC_GAIN" \
         --volume-step=1 \
-        # --no-volume-save
+        --no-volume-save \
         -I rc --rc-host="$VLC_RC_HOST:$VLC_RC_PORT" \
         "$AUDIO_SRC"
     )
@@ -297,6 +304,7 @@ function _start_playback() {
     echo "Station: $TITLE" > "$STATUSFILE"
     echo "Stream URL: $AUDIO_SRC" >> "$STATUSFILE"
     vlc "${VLC_ARGS[@]}" & echo $! > $PIDFILE_VLC
+    echo statuuuuus $?
     if [[ -n "$VOLUME_INCREMENT_ENABLED" ]]; then
         echo "Volume will be incremented successively..."
         _wait_until_tcp_port_open "$VLC_RC_HOST" "$VLC_RC_PORT"
