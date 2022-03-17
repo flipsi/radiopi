@@ -219,7 +219,6 @@ function _configure_vlc_netcat_cmd() {
             exit 1
         fi
     fi
-    echo VLC_NETCAT_CMD is "$VLC_NETCAT_CMD"
 }
 
 # TODO: debug.
@@ -305,7 +304,7 @@ function _start_playback() {
         "${VLC_OUTPUT_ARGS[@]}" \
         --gain="$VLC_GAIN" \
         --volume-step=1 \
-        --no-volume-save \
+        # --no-volume-save
         -I rc --rc-host="$VLC_RC_HOST:$VLC_RC_PORT" \
         "$AUDIO_SRC"
     )
@@ -313,7 +312,6 @@ function _start_playback() {
     echo "Station: $TITLE" > "$STATUSFILE"
     echo "Stream URL: $AUDIO_SRC" >> "$STATUSFILE"
     vlc "${VLC_ARGS[@]}" & echo $! > $PIDFILE_VLC
-    echo statuuuuus $?
     if [[ -n "$VOLUME_INCREMENT_ENABLED" ]]; then
         echo "Volume will be incremented successively..."
         _wait_until_tcp_port_open "$VLC_RC_HOST" "$VLC_RC_PORT"
