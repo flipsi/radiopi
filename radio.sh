@@ -74,6 +74,7 @@ RADIO_STATION_LIST["Die Maus"]="https://wdr-diemaus-live.icecastssl.wdr.de/wdr/d
 RADIO_STATION_LIST["Brainradio Klassik"]="http://brainradioklassik.stream.laut.fm/brainradioklassik"
 RADIO_STATION_LIST["Linn Jazz"]="http://radio.linn.co.uk:8000/autodj"
 RADIO_STATION_LIST["Radio Swiss Jazz"]="http://www.radioswissjazz.ch/live/mp3.m3u"
+RADIO_STATION_LIST["RTL 102.5"]="https://streamingv2.shoutcast.com/rtl-1025"
 RADIO_STATION_LIST["Lounge Radio"]="https://stream.laut.fm/loungeradio"
 RADIO_STATION_LIST["Soul Radio"]="http://soulradio02.live-streams.nl:80/live"
 RADIO_STATION_LIST["The Summit FM"]="http://streamer2.legatocommunications.com/wapshq"
