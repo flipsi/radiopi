@@ -11,7 +11,7 @@ umask 000
 
 [ "${BASH_VERSINFO:-0}" -ge 4 ] || (echo "Bash version >= 4 required, sorry." && exit 1)
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
+DIR="$(realpath --no-symlinks "$(dirname "${BASH_SOURCE[0]}")")"
 SELF=$(basename "$0")
 
 function _print_help_msg() {
