@@ -46,9 +46,10 @@ document.addEventListener("DOMContentLoaded", function(){
       let touchend = { x: 0, y: 0};
 
       handleGesture = () => {
+        const minDistance = 30; // minimal distance (threshold) for a swipe gesture to be detected
         const distanceX = Math.abs(touchstart.x - touchend.x);
         const distanceY = Math.abs(touchstart.y - touchend.y);
-        const horizontal = distanceX > distanceY;
+        const horizontal = distanceX > distanceY && distanceX > minDistance;
         const left = horizontal && touchend.x < touchstart.x;
         const right = horizontal && touchend.x > touchstart.x;
         if (left && typeof onSwipeLeft == 'function') onSwipeLeft();
