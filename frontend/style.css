@@ -39,13 +39,28 @@ input {
   font-family: 'Krona One', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 1.1em;
 }
-input[type='submit'] {
-  margin-bottom: 15px;
+input[type='submit'],
+.submit {
+  width: fit-content;
+  margin: 10px 5px 10px 0;
+  padding: 2px 15px 2px 5px;
+  border-radius: 6px;
+  border-style: solid;
 }
 input[type='submit']:hover,
 .submit:hover,
 .stationlink:hover {
   cursor: pointer;
+}
+/* for some reason those guys need extra care  */
+form[name="volume_up_form"] .submit,
+form[name="volume_down_form"] .submit {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.playbackbutton.material-icons {
+  font-size: 36px;
 }
 
 .inline {
@@ -95,6 +110,11 @@ main > .module.active {
   margin-top: 6px;
   margin-bottom: 18px;
 }
+.block.spread {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 .material-icons {
   vertical-align: middle;
@@ -124,12 +144,16 @@ main > .module.active {
 
 .radiostatus,
 .module.alarm .status,
+.timer .title,
 input[type='submit'] {
   font-size: 1.2em;
   line-height: 1.8;
 }
 .radiostatus .title {
   font-size: 1.5em;
+}
+.timer .title {
+  margin-top: 40px;
 }
 
 #alarmtime {
@@ -155,7 +179,7 @@ footer span:last-child {
 .equaliser-container {
     height: 50px;
     width: 100%;
-    margin: 0 0;
+    margin: 0 0 20px 0;
     padding: 0 0 0 0;
     position: relative;
 }

@@ -5,7 +5,8 @@ body {
 
 h1,
 .radiostatus,
-.module.alarm .status {
+.module.alarm .status,
+.timer .title {
   color: #888;
 }
 
@@ -14,8 +15,10 @@ input {
   color: #222;
 }
 
-input[type='submit'] {
-  background-color: #D6264F;
+input[type='submit'],
+.submit {
+  border-color: #D6264F;
+  background-color: #333;
   color: #ddd;
 }
 
@@ -41,14 +44,15 @@ footer em {
 form.pending .playbackbutton {
   color: #999;
 }
-form.pending input[type='submit'] {
+form.pending input[type='submit'],
+form.pending .submit {
   background-color: #333;
   border-color: #333;
   color: #888;
 }
 
 .radiostatus .title,
-.module.alarm .status .time {
+.time {
   color: #FFBC42;
 }
 

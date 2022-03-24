@@ -40,6 +40,7 @@ function write_log($log_msg) {
 }
 
 $errors = array();
+
 function exec_radio_script($arguments, &$output, &$exit_code) {
     global $errors;
     $cmd = PATH_TO_RADIO_SCRIPT . ' ' . $arguments . ' 2>&1';
@@ -76,6 +77,14 @@ if (!empty($_POST['action'])) {
             break;
         case 'volume_up':
             exec_radio_script("volume +$volume_step >/dev/null", $action_output, $action_exit_code);
+            break;
+        case 'enable_timer':
+            preg_match('/(\d+)/', $_POST['timerduration'], $timerduration_matches);
+            $duration = $timerduration_matches[1];
+            exec_radio_script("sleep $duration", $action_output, $action_exit_code);
+            break;
+        case 'disable_timer':
+            exec_radio_script("nosleep", $action_output, $action_exit_code);
             break;
         case 'enable_alarm':
             preg_match('/(\d\d):(\d\d)/', $_POST['alarmtime'], $alarmtime_matches);
@@ -190,7 +199,7 @@ header("Expires: 0"); // Proxies.
                     </div>
                 </form>
             </div>
-            <div class="block radiocontrols <?php echo $hide_volume_controls ? "hidden" : ""; ?>">
+            <div class="block spread radiocontrols <?php echo $hide_volume_controls ? "hidden" : ""; ?>">
                 Volume:
                 <form class="inline" name="volume_down_form" action="" method="post">
                     <input type="hidden" name="action" value="volume_down" />
@@ -206,6 +215,42 @@ header("Expires: 0"); // Proxies.
                         up
                     </span>
                 </form>
+            </div>
+            <div class="block timer">
+                <div class="block title">
+                    Sleep Timer
+                </div>
+
+                <form name="timer_form" action="" method="post">
+
+                <?php if ($radio_status['Timer'] === 'enabled') { ?>
+
+                    <div class="block">
+                        Radio stops at
+                        <span class="time"><?php echo $radio_status['Timer set to']; ?></span>.
+                    </div>
+                    <div class="submit">
+                        <input type="hidden" name="action" value="disable_timer" />
+                        <span class="material-icons playbackbutton">close</span>
+                        Disable timer
+                    </div>
+
+                <?php } else { ?>
+
+                    <div class="block spread">
+                        <label for="alarmtime">Duration in minutes:</label>
+                        <input type="number" min="1" max="250" id="timerduration" name="timerduration" value="30" />
+                    </div>
+                    <div class="submit">
+                        <input type="hidden" name="action" value="enable_timer" />
+                        <span class="material-icons playbackbutton">done</span>
+                        Set timer
+                    </div>
+
+                <?php } ?>
+
+                </form>
+
             </div>
 
         <?php
@@ -259,7 +304,10 @@ header("Expires: 0"); // Proxies.
             </div>
             <div class="block">
                 <input type="hidden" name="action" value="disable_alarm" />
-                <input type="submit" value="Disable alarm" />
+                <div class="submit">
+                    <span class="material-icons playbackbutton">close</span>
+                    Disable alarm
+                </div>
             </div>
 
         <?php } else { ?>
@@ -267,17 +315,20 @@ header("Expires: 0"); // Proxies.
             <div class="block status">
                 Alarm is disabled.
             </div>
-            <div class="block">
+            <div class="block spread">
                 <label for="alarmtime">Alarm time:</label>
-                <input type="hidden" name="action" value="enable_alarm" />
                 <input type="time" id="alarmtime" name="alarmtime" value="08:00" />
             </div>
-            <div class="block">
+            <div class="block spread">
                 <label for="alarmduration">Duration in minutes:</label>
                 <input type="number" min="1" max="150" id="alarmduration" name="alarmduration" value="60" />
             </div>
             <div class="block">
-                <input type="submit" value="Save" />
+                <div class="submit">
+                    <input type="hidden" name="action" value="enable_alarm" />
+                    <span class="material-icons playbackbutton">done</span>
+                    Set alarm
+                </div>
             </div>
 
         <?php } ?>
