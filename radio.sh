@@ -23,6 +23,8 @@ SYNOPSIS
     $SELF [OPTIONS]       [QUERY|URL] Start radio (synchronously).
     $SELF [OPTIONS] start [QUERY|URL] Start radio (in the background).
     $SELF stop                        Stop radio.
+    $SELF sleep <D>                   Stop radio in <D> minutes.
+    $SELF nosleep                     Remove scheduled timer.
     $SELF status                      Print information about currently played station.
     $SELF list                        List available radio stations (hardcoded in this script).
     $SELF volume [[+-]<num>]          Set (or get) audio volume (get has a known bug).
@@ -51,8 +53,14 @@ EOF
 }
 
 
+function has() {
+    local COMMAND="$1"
+    command -v "$COMMAND" >/dev/null
+}
+
 function require() {
-    if ! (command -v "$1" >/dev/null); then
+    local COMMAND="$1"
+    if ! has "$COMMAND"; then
         echo "ERROR: Command $1 required. Please install the corresponding package!"
         exit 1
     fi
@@ -101,8 +109,9 @@ VLC_GAIN=${VLC_GAIN:-0.9}
 VLC_RC_HOST=localhost
 VLC_RC_PORT=9592 # hardcoded because using lsof (_find_unused_port) may be problematic
 
-# suffix appended to crontab line, will be grepped for and matched lines will be deleted!
+# suffixes appended to crontab line, will be grepped for and matched lines will be deleted!
 ALARM_CRON_ID="MANAGED RADIO ALARM CRON"
+TIMER_CRON_ID="MANAGED RADIO TIMER CRON"
 
 STATEDIR=/tmp/radiopi
 PIDFILE_VLC="$STATEDIR/vlc.pid"
@@ -394,10 +403,13 @@ function _print_status_msg() {
         else
             echo "Volume increment: off"
         fi
+        if has crontab; then
+            _echo_timer_status
+        fi
     else
         echo "Status: off"
     fi
-    if command -v 'crontab' >/dev/null; then
+    if has crontab; then
         _echo_alarm_status
     fi
 }
@@ -422,6 +434,21 @@ function _close_crontab() {
     crontab < "$TMP_CRONTAB_FILE"
 }
 
+function _echo_timer_status() {
+    if crontab -l >/dev/null 2>&1; then
+        _open_crontab
+        TIME=$(awk "/stop.*$TIMER_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
+        if [[ -n "$TIME" ]]; then
+            echo "Timer: enabled"
+            echo "Timer set to: $TIME"
+        else
+            echo "Timer: disabled"
+        fi
+    else
+        echo "Timer: disabled"
+    fi
+}
+
 function _echo_alarm_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
@@ -437,6 +464,29 @@ function _echo_alarm_status() {
     fi
 }
 
+function _set_sleep_timer() {
+    local DURATION="$1"
+    HOUR=$(  date -d "$DURATION minutes" +'%H')
+    MINUTE=$(date -d "$DURATION minutes" +'%M')
+    STOP_LINE="$MINUTE $HOUR * * * \$RADIO_CMD stop >>\$RADIO_LOG 2>&1 # $TIMER_CRON_ID"
+    _open_crontab
+    _disable_timer_inner
+    _append_once "$TMP_CRONTAB_FILE" "RADIO_CMD=$DIR/$SELF"
+    _append_once "$TMP_CRONTAB_FILE" "RADIO_LOG=$STATEDIR/radio.log"
+    _append_once "$TMP_CRONTAB_FILE" "$STOP_LINE"
+    _close_crontab
+    echo "Set sleep timer to $HOUR:$MINUTE."
+    if ! pgrep crond >/dev/null; then
+        echo "WARNING: Make sure your cron service is running!"
+    fi
+}
+
+function _disable_timer() {
+    _open_crontab
+    _disable_timer_inner
+    _close_crontab
+}
+
 function _enable_alarm() {
     local ALPHA_HOUR="$1"
     local ALPHA_MINUTE="$2"
@@ -445,17 +495,17 @@ function _enable_alarm() {
     local OMEGA_MINUTE
     OMEGA_HOUR=$(  date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%H')
     OMEGA_MINUTE=$(date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%M')
+    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * * \$RADIO_CMD start -r -w >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
+    OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * * \$RADIO_CMD stop        >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
     _open_crontab
     _disable_alarm_inner
-    _append_once "$TMP_CRONTAB_FILE" "ALARM_CMD=$DIR/$SELF"
-    _append_once "$TMP_CRONTAB_FILE" "ALARM_LOG=$STATEDIR/alarm.log"
-    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * * \$ALARM_CMD start -r -w >>\$ALARM_LOG 2>&1 # $ALARM_CRON_ID"
-    OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * * \$ALARM_CMD stop        >>\$ALARM_LOG 2>&1 # $ALARM_CRON_ID"
+    _append_once "$TMP_CRONTAB_FILE" "RADIO_CMD=$DIR/$SELF"
+    _append_once "$TMP_CRONTAB_FILE" "RADIO_LOG=$STATEDIR/radio.log"
     _append_once "$TMP_CRONTAB_FILE" "$ALPHA_LINE"
     _append_once "$TMP_CRONTAB_FILE" "$OMEGA_LINE"
     _close_crontab
     echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE."
-    if ! pgrep crond; then
+    if ! pgrep crond >/dev/null; then
         echo "WARNING: Make sure your cron service is running!"
     fi
 }
@@ -469,6 +519,10 @@ function _disable_alarm() {
 
 function _disable_alarm_inner() {
     awk -i inplace -v rmv="$ALARM_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+}
+
+function _disable_timer_inner() {
+    awk -i inplace -v rmv="$TIMER_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
 }
 
 function _main() {
@@ -515,7 +569,30 @@ function _main() {
                 ;;
             stop)
                 _stop_playback
+                _disable_timer
                 exit 0
+                ;;
+            nosleep)
+                _disable_timer
+                echo "Removed scheduled stop."
+                exit 0
+                ;;
+            sleep)
+                require crontab
+                if [[ -n "$2" && "$2" =~ ^[0-9]{1,3}$ ]]; then
+                    DURATION="$2"
+                else
+                    echo "ERROR: Duration required in minutes."
+                    exit 1
+                fi
+                shift
+                if _is_playing; then
+                    _set_sleep_timer "$DURATION"
+                    exit 0
+                else
+                    echo "ERROR: No radio playing."
+                    exit 1
+                fi
                 ;;
             volume)
                 VOLUME="$2"
