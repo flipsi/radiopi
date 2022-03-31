@@ -66,7 +66,9 @@ function require() {
     fi
 }
 
+
 require vlc
+require gawk # We want GNU awk. Raspbian apparently has the old Mawk, see https://forums.raspberrypi.com/viewtopic.php?p=178094
 require lsof
 require nc
 
@@ -437,7 +439,7 @@ function _close_crontab() {
 function _echo_timer_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
-        TIME=$(awk "/stop.*$TIMER_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
+        TIME=$(gawk "/stop.*$TIMER_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
         if [[ -n "$TIME" ]]; then
             echo "Timer: enabled"
             echo "Timer set to: $TIME"
@@ -452,7 +454,7 @@ function _echo_timer_status() {
 function _echo_alarm_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
-        TIME=$(awk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
+        TIME=$(gawk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
         if [[ -n "$TIME" ]]; then
             echo "Alarm: enabled"
             echo "Alarm time: $TIME"
@@ -518,11 +520,11 @@ function _disable_alarm() {
 }
 
 function _disable_alarm_inner() {
-    awk -i inplace -v rmv="$ALARM_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+    gawk -i inplace -v rmv="$ALARM_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
 }
 
 function _disable_timer_inner() {
-    awk -i inplace -v rmv="$TIMER_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+    gawk -i inplace -v rmv="$TIMER_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
 }
 
 function _main() {
