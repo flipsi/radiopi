@@ -14,9 +14,7 @@ define("NO_VOLUME_HOSTS", ["idefix"]);
 
 // NOTE that the webserver user needs permissions to access audio, e.g. on Arch Linux be part of the `audio` group.
 
-// NOTE that for using the real /tmp, we would have to add `PrivateTmp=no` to /usr/lib/systemd/system/nginx.service.
-// Otherwise a magically created systemd directory /tmp/systemd-private-*-httpd.service-* is used.
-// See https://stackoverflow.com/questions/55014399/why-doesnt-php-7-2-fopen-tmp-a-write-to-the-file/55016941#55016941
+// NOTE that this may be a private tmp dir of the webserver (see README)
 define("LOGFILE", "/tmp/radiopi_frontend.log");
 
 $volume_step = 10;
