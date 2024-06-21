@@ -5,7 +5,7 @@
 /////////////////////////////////////
 
 // Path to backend (radio.sh script)
-define("PATH_TO_RADIO_SCRIPT", "/home/sflip/bin/radio");
+define("PATH_TO_RADIO_SCRIPT", "/home/flipsi/bin/radio");
 
 // On some hosts, volume should be managed separately from this application.
 // This is especially relevant until https://github.com/sflip/radiopi/issues/2 is fixed.
