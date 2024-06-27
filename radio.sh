@@ -307,7 +307,9 @@ function _start_playback() {
     fi
     # VLC_RC_PORT=$(_find_unused_port) # using lsof may be problematic (e.g. for webserver users)
     echo "$VLC_RC_PORT" > "$PORTFILE"
-    if aplay -L | grep -q "$ALSA_DEVICE"; then
+    if ! command -v aplay >/dev/null; then
+        echo "WARNING: aplay command not found. Using default ALSA device, ignoring \$ALSA_DEVICE ($ALSA_DEVICE). You may want to install the alsa-utils package."
+    elif aplay -L | grep -q "$ALSA_DEVICE"; then
         # echo "Using device $ALSA_DEVICE"
         VLC_OUTPUT_ARGS=(--aout=alsa --alsa-audio-device="$ALSA_DEVICE")
     fi
