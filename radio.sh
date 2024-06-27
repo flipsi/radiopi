@@ -427,7 +427,7 @@ function _append_once() {
 
 function _open_crontab() {
     if ! crontab -l >/dev/null 2>&1; then
-        echo "ERROR: You don't have a crontab file yet. Create one with \`crontab -e\`."
+        echo "ERROR: You don't have a crontab file yet. Create one with \`crontab -e\` (it can be empty)."
         exit 1
     fi
     crontab -l > "$TMP_CRONTAB_FILE"
