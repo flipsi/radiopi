@@ -70,6 +70,10 @@ if (!empty($_POST['action'])) {
         case 'stop_playback':
             exec_radio_script('stop', $action_output, $action_exit_code);
             break;
+        case 'volume_set':
+            $volume_value = $_POST['volume_value'];
+            exec_radio_script("volume $volume_value >/dev/null", $action_output, $action_exit_code);
+            break;
         case 'volume_down':
             exec_radio_script("volume -$volume_step >/dev/null", $action_output, $action_exit_code);
             break;
@@ -199,20 +203,20 @@ header("Expires: 0"); // Proxies.
             </div>
             <div class="block spread radiocontrols <?php echo $hide_volume_controls ? "hidden" : ""; ?>">
                 Volume:
-                <form class="inline" name="volume_down_form" action="" method="post">
-                    <input type="hidden" name="action" value="volume_down" />
-                    <span class="submit">
-                        <span class="material-icons playbackbutton">volume_down</span>
-                        down
-                    </span>
-                </form>
-                <form class="inline" name="volume_up_form" action="" method="post">
-                    <input type="hidden" name="action" value="volume_up" />
-                    <span class="submit">
-                        <span class="material-icons playbackbutton">volume_up</span>
-                        up
-                    </span>
-                </form>
+                <div class="slidecontainer">
+                    <form class="inline" name="volume_slider_form" action="" method="post">
+                        <input type="hidden" name="action" value="volume_set" />
+                        <input type="range"
+                            name="volume_value"
+                            min="0"
+                            max="200"
+                            step="<?php echo $volume_step; ?>"
+                            value="<?php echo $radio_status['Volume']; ?>"
+                            onmouseup="this.form.submit()"
+                            onkeyup="this.form.submit()"
+                            ontouchend="this.form.submit()">
+                    </form>
+                </div>
             </div>
             <div class="block timer">
                 <div class="block title">
