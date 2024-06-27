@@ -101,6 +101,7 @@ ALSA_DEVICE="${ALSA_DEVICE:-plughw:CARD=sndrpihifiberry,DEV=0}"
 
 ALARM_DEFAULT_DURATION=60
 
+VOLUME_INIT=100
 VOLUME_INCREMENT_INIT=60
 VOLUME_INCREMENT_COUNT=15
 VOLUME_INCREMENT_FREQUENCY=$((60 * 2))
@@ -232,12 +233,18 @@ function _configure_vlc_netcat_cmd() {
     fi
 }
 
-# TODO: debug.
-# `echo volume | nc -c localhost 9555` doesn't output anything, but interactively it works
 function _get_vlc_volume() {
-    _configure_vlc_netcat_cmd
-    echo "volume" | $VLC_NETCAT_CMD
-    echo "$VOLUME"
+    # TODO: debug.
+    # `echo volume | nc -c localhost 9555` doesn't output anything, but interactively it works
+    # _configure_vlc_netcat_cmd
+    # echo "volume" | $VLC_NETCAT_CMD
+    # echo "$VOLUME"
+
+    ## FALLBACK implemenation
+    if ! [[ -s "$VOLUMEFILE" ]]; then
+        echo "$VOLUME_INIT" > "$VOLUMEFILE"
+    fi
+    cat "$VOLUMEFILE"
 }
 
 function _set_vlc_volume() {
@@ -246,24 +253,22 @@ function _set_vlc_volume() {
         echo "ERROR: Invalid volume $VOLUME"
         exit 1
     fi
+    if [[ "$VOLUME" =~ ^[+-] ]]; then
+        CURRENT_VOLUME=$(_get_vlc_volume)
+        ABSOLUTE_VOLUME=$(("$CURRENT_VOLUME""$VOLUME"))
+    else
+        ABSOLUTE_VOLUME="$VOLUME"
+    fi
+
     _configure_vlc_netcat_cmd
     echo "volume $VOLUME" | $VLC_NETCAT_CMD
-    # TODO: uncomment as soon as _get_vlc_volume is debugged:
-    # ABSOLUTE_VOLUME=$(_get_vlc_volume)
-    # echo "$ABSOLUTE_VOLUME" > "$VOLUMEFILE"
-    # echo "Set VLC volume to $ABSOLUTE_VOLUME"
-    echo "$VOLUME" > "$VOLUMEFILE"
-    echo "Set VLC volume ($VOLUME)"
-}
-
-function _update_volume_file() {
-    VOLUME=$(_get_vlc_volume)
-    echo "$VOLUME" > "$VOLUMEFILE"
+    echo "$ABSOLUTE_VOLUME" > "$VOLUMEFILE"
+    echo "Set VLC volume to $ABSOLUTE_VOLUME"
 }
 
 function _list_stations() {
     for STATION in "${!RADIO_STATION_LIST[@]}"; do
-        echo $STATION
+        echo "$STATION"
     done
 }
 
@@ -333,15 +338,16 @@ function _start_playback() {
         for (( i = 0; i < VOLUME_INCREMENT_COUNT; i++ )); do
             sleep "$VOLUME_INCREMENT_FREQUENCY"
             _set_vlc_volume "+$VOLUME_INCREMENT_AMOUNT"
-            _update_volume_file
         done
         rm $PIDFILE_INC
         ) & echo $! > $PIDFILE_INC
         echo "Volume increment PID: $(cat $PIDFILE_INC)"
     else
+        _wait_until_tcp_port_open "$VLC_RC_HOST" "$VLC_RC_PORT"
+        ABSOLUTE_VOLUME=$(_get_vlc_volume)
+        _set_vlc_volume "$ABSOLUTE_VOLUME"
         echo "Playing at constant volume."
     fi
-    _update_volume_file
     if [[ -z "$DETACH" ]]; then
         fg # play until interrupt
         _cleanup_after_playback
@@ -353,10 +359,10 @@ function _stop_playback() {
         if [[ ! -f $PIDFILE ]]; then
             echo "WARNING: Did not find PID file $PIDFILE"
         else
-            PID=$(cat $PIDFILE)
+            PID=$(cat "$PIDFILE")
             if ps "$PID" >/dev/null; then
                 echo "Killing process with PID $PID"
-                kill "$PID" && rm $PIDFILE
+                kill "$PID" && rm "$PIDFILE"
             else
                 echo "WARNING: No process found with PID $PID"
                 rm "$PIDFILE"
@@ -402,6 +408,7 @@ function _print_status_msg() {
     if [[ -f "$STATUSFILE" ]]; then
         echo "Status: on"
         cat "$STATUSFILE"
+        echo "Volume: $(_get_vlc_volume)"
         if [[ -f $PIDFILE_INC ]]; then
             echo "Volume increment: on"
         else
@@ -603,7 +610,7 @@ function _main() {
                 shift
                 if _is_playing; then
                     if [[ -z "$VOLUME" ]]; then
-                        cat "$VOLUMEFILE"
+                        _get_vlc_volume
                     else
                         shift
                         _set_vlc_volume "$VOLUME"
