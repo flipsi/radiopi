@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function(){
     // detect swipe gestures
     (() => {
       const slideArea = document.body;
+      let touchtarget = null;
       let touchstart = { x: 0, y: 0};
       let touchend = { x: 0, y: 0};
 
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function(){
           x: e.changedTouches[0].screenX,
           y: e.changedTouches[0].screenY
         };
+        touchtarget = e.target;
       })
 
       slideArea.addEventListener('touchend', e => {
@@ -68,7 +70,8 @@ document.addEventListener("DOMContentLoaded", function(){
           x: e.changedTouches[0].screenX,
           y: e.changedTouches[0].screenY
         };
-        handleGesture();
+        if (touchtarget.type != 'range')
+          handleGesture();
       })
 
     })();
