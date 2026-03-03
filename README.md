@@ -23,7 +23,7 @@ It offers a bash script for command line usage and a [Progressive Web App](https
 * Configure webserver to be able to access system audio (i.e. add webserver user to `audio` group via `sudo usermod -aG audio www-data`)
 * If you want to use the scheduled alarm feature:
     * Install a cron service and create a crontab for the webserver user (e.g. `sudo -u www-data crontab -e`)
-    * In systemd, disable the [private tmp directory][systemd-private-tmp] of the webserver (e.g. in ` /lib/systemd/system/apache2.service` or `/usr/lib/systemd/system/httpd.service` or `/usr/lib/systemd/system/nginx.service`).
+    * In systemd, disable the [private tmp directory][systemd-private-tmp] of the webserver (`PrivateTmp=false` in ` /lib/systemd/system/apache2.service` or `/usr/lib/systemd/system/httpd.service` or `/usr/lib/systemd/system/nginx.service`). Beware that this may be overwritten on system updates.
 * Symlink [the frontend](./fontend/) to your webserver's document root
 
 
@@ -43,7 +43,7 @@ You can find web radio stream URLs at these sites:
 
 ## Author
 
-Philipp Moers – [@soziflip](https://twitter.com/soziflip)
+Philipp Moers – [Personal Website](https://philippmoers.de)
 
 
 ## License
