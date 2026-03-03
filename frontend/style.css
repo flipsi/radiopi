@@ -235,6 +235,11 @@ main > .module.active {
   font-size: 0.8em;
 }
 
+.align-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
 footer {
   position: fixed;
   bottom: 0;

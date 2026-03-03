@@ -230,7 +230,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 </ol>
             <?php } ?>
             </div>
-            <div class="block radiocontrols">
+            <div class="block radiocontrols align-right">
                 <form name="stop_playback_form" action="" method="post">
                     <input type="hidden" name="action" value="stop_playback" />
                     <div class="submit">
@@ -280,10 +280,12 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                         <label for="alarmtime">Duration in minutes:</label>
                         <input type="number" min="1" max="250" id="timerduration" name="timerduration" value="30" />
                     </div>
-                    <div class="submit">
-                        <input type="hidden" name="action" value="enable_timer" />
-                        <span class="material-icons playbackbutton">done</span>
-                        Set timer
+                    <div class="align-right">
+                        <div class="submit">
+                            <input type="hidden" name="action" value="enable_timer" />
+                            <span class="material-icons playbackbutton">done</span>
+                            Set timer
+                        </div>
                     </div>
 
                 <?php } ?>
@@ -375,7 +377,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 </form>
             <?php } ?>
 
-            <div class="block disable-all-container">
+            <div class="block disable-all-container align-right">
                 <form name="disable_all_alarms_form" action="" method="post">
                     <input type="hidden" name="action" value="disable_alarm" />
                     <div class="submit">
@@ -438,7 +440,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                     ?>
                 </div>
             </div>
-            <div class="block">
+            <div class="block align-right">
                 <div class="submit">
                     <input type="hidden" name="action" value="enable_alarm" />
                     <span class="material-icons playbackbutton">done</span>
