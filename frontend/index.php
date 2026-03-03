@@ -5,7 +5,7 @@
 /////////////////////////////////////
 
 // Path to backend (radio.sh script)
-define("PATH_TO_RADIO_SCRIPT", "/home/flipsi/bin/radio");
+define("PATH_TO_RADIO_SCRIPT", "/opt/radio");
 
 // On some hosts, volume should be managed separately from this application.
 // This is especially relevant until https://github.com/sflip/radiopi/issues/2 is fixed.
@@ -59,6 +59,10 @@ function parse_radio_status($radio_status_output) {
     }
     return $radio_status;
 }
+
+header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
+header("Pragma: no-cache"); // HTTP 1.0.
+header("Expires: 0"); // Proxies.
 
 
 if (!empty($_POST['action'])) {
@@ -114,10 +118,6 @@ exec_radio_script('status', $radio_status_output, $radio_status_exit_code);
 $radio_status = parse_radio_status($radio_status_output);
 
 $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 'enabled' ? 'alarm' : 'radio';
-
-header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
-header("Pragma: no-cache"); // HTTP 1.0.
-header("Expires: 0"); // Proxies.
 
 ?>
 
