@@ -2,9 +2,24 @@ radiopi
 =======
 
 radiopi is a small utility to conveniently play some web radio, e.g. on a Raspberry Pi.
-It offers a bash script for command line usage and a [Progressive Web App](https://de.wikipedia.org/wiki/Progressive_Web_App) as a frontend.
 
-## Installation
+Really, it consists of two parts:
+* the backend, which is just a glorified bash script for command line usage, as well as
+* the frontend, a [Progressive Web App][progressive-web-app] written in good old PHP.
+
+
+## Get Started / Installation
+
+### Alternative A: Containerized version
+
+* To try it out or for development, run `./run.sh`.
+
+This is useful for frontend development, but a current limitation is that there's no audio from within the container.
+
+TODO: Access audio from within container (container pulseaudio and host pipewire - this may be problematic lol)
+TODO: Adjust the Dockerfile for production (copy files instead of mounting volume).
+
+### Alternative B: Direct installation on host system
 
 * Make sure to install dependencies:
     * ALSA sound system (probably already installed)
@@ -43,12 +58,13 @@ You can find web radio stream URLs at these sites:
 
 ## Author
 
-Philipp Moers – [Personal Website](https://philippmoers.de)
+Philipp Moers – [Personal Website][philippmoers.de]
 
 
 ## License
 
 This software is provided under the [MIT license](LICENSE.md).
 
-
+[progressive-web-app]: https://de.wikipedia.org/wiki/Progressive_Web_App
 [systemd-private-tmp]: https://www.freedesktop.org/software/systemd/man/systemd.exec.html#PrivateTmp=
+[philippmoers.de]: https://philippmoers.de
