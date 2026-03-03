@@ -20,17 +20,17 @@ $SELF - play some web radio
 
 SYNOPSIS
 
-    $SELF [OPTIONS]       [QUERY|URL] Start radio (synchronously).
-    $SELF [OPTIONS] start [QUERY|URL] Start radio (in the background).
-    $SELF stop                        Stop radio.
-    $SELF sleep <D>                   Stop radio in <D> minutes.
-    $SELF nosleep                     Remove scheduled timer.
-    $SELF status                      Print information about currently played station.
-    $SELF list                        List available radio stations (hardcoded in this script).
-    $SELF volume [[+-]<num>]          Set (or get) audio volume (get has a known bug).
-    $SELF enable <H> <M> [<D>]        Schedule daily alarm at <Hour>:<Minute> (for <Duration> mins).
-    $SELF disable                     Remove scheduled alarm.
-    $SELF help                        Print this help message.
+    $SELF [OPTIONS]       [QUERY|URL]   Start radio (synchronously).
+    $SELF [OPTIONS] start [QUERY|URL]   Start radio (in the background).
+    $SELF stop                          Stop radio.
+    $SELF sleep <D>                     Stop radio in <D> minutes.
+    $SELF nosleep                       Remove scheduled timer.
+    $SELF status                        Print information about currently played station.
+    $SELF list                          List available radio stations (hardcoded in this script).
+    $SELF volume [[+-]<num>]            Set (or get) audio volume (get has a known bug).
+    $SELF enable <H> <M> [<D> [<DOW>]]  Schedule alarm at <Hour>:<Minute> (for <Duration> mins) on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day).
+    $SELF disable                       Remove scheduled alarm.
+    $SELF help                          Print this help message.
 
 DESCRIPTION
 
@@ -502,12 +502,13 @@ function _enable_alarm() {
     local ALPHA_HOUR="$1"
     local ALPHA_MINUTE="$2"
     local DURATION="$3"
+    local DAY_OF_WEEK="$4"
     local OMEGA_HOUR
     local OMEGA_MINUTE
     OMEGA_HOUR=$(  date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%H')
     OMEGA_MINUTE=$(date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%M')
-    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * * \$RADIO_CMD start -r -w >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
-    OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * * \$RADIO_CMD stop        >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
+    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD start -r -w >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
+    OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD stop        >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
     _open_crontab
     _disable_alarm_inner
     _append_once "$TMP_CRONTAB_FILE" "RADIO_CMD=$DIR/$SELF"
@@ -515,7 +516,11 @@ function _enable_alarm() {
     _append_once "$TMP_CRONTAB_FILE" "$ALPHA_LINE"
     _append_once "$TMP_CRONTAB_FILE" "$OMEGA_LINE"
     _close_crontab
-    echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE."
+    if [[ "$DAY_OF_WEEK" = "*" ]]; then
+        echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE."
+    else
+        echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE at day(s) $DAY_OF_WEEK of the week."
+    fi
     if ! pgrep crond >/dev/null; then
         echo "WARNING: Make sure your cron service is running!"
     fi
@@ -629,12 +634,17 @@ function _main() {
                     else
                         DURATION="$ALARM_DEFAULT_DURATION"
                     fi
+                    DAY_OF_WEEK="${5:-*}"   # default to every day
+                    if [[ ! "$DAY_OF_WEEK" =~ ^(\*|[0-7])$ ]]; then
+                        echo "ERROR: Day of week must be between 0 and 7 (inclusive) or '*' for every day."
+                        exit 1
+                    fi
+                    _enable_alarm "$2" "$3" "$DURATION" "$DAY_OF_WEEK"
+                    exit 0
                 else
                     echo "ERROR: Hour and minute required as separate arguments."
                     exit 1
                 fi
-                _enable_alarm "$2" "$3" "$DURATION"
-                exit 0
                 ;;
             disable)
                 require crontab
