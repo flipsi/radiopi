@@ -463,7 +463,11 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
 
         <div class="module info">
             <div class="info-module">
+
+                <img src="radiopi-icon-192.png" class="logo" alt="radiopi logo" />
+
                 <h2>radiopi</h2>
+
                 <p>
                     <em>
                         <a href="https://github.com/flipsi/radiopi">radiopi</a>
