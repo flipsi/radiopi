@@ -460,7 +460,9 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
             <div class="info-module">
                 <h2>radiopi</h2>
                 <p>
-                    <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
+                    <em>
+                        <a href="https://github.com/flipsi/radiopi">radiopi</a>
+                    </em>
                     can play web radio.
                 </p>
                 <p>
