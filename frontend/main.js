@@ -115,32 +115,31 @@ document.addEventListener("DOMContentLoaded", function(){
   function addStationLinkEventHandler() {
     const startPlaybackForm = document.forms['start_playback_form'];
     const stationInput = document.getElementById('stationinput');
-    const stationLinks = document.getElementsByClassName('stationlink');
-    for (let i = 0; i < stationLinks.length; i++) {
-      const link = stationLinks[i];
-      link.addEventListener('click', e => {
-        const title = link.getElementsByClassName('station')[0].innerText;
-        stationInput.value = title;
-        if (!startPlaybackForm.classList.contains('pending'))
-          startPlaybackForm.submit();
-        startPlaybackForm.classList.add('pending');
+    const stationList = document.getElementById('stationlist');
+    if (stationList) {
+      stationList.addEventListener('click', e => {
+        const link = e.target.closest('.stationlink');
+        if (link) {
+          const title = link.querySelector('.station').innerText;
+          stationInput.value = title;
+          if (!startPlaybackForm.classList.contains('pending')) {
+            startPlaybackForm.submit();
+            startPlaybackForm.classList.add('pending');
+          }
+        }
       });
     }
   }
 
   function addSubmitEventHandlers() {
-    [
-      document.getElementsByClassName('submit'),
-      document.querySelectorAll('input[type=submit]'),
-    ].forEach(things => {
-      for (let i = 0; i < things.length; i++) {
-        const thing = things[i];
+    document.body.addEventListener('click', e => {
+      const thing = e.target.closest('.submit') || e.target.closest('input[type=submit]');
+      if (thing) {
         const form = thing.closest('form');
-        thing.addEventListener('click', e => {
-          if (!form.classList.contains('pending'))
-            form.submit();
+        if (form && !form.classList.contains('pending')) {
+          form.submit();
           form.classList.add('pending');
-        });
+        }
       }
     });
   }
