@@ -24,17 +24,25 @@ input[type='submit'],
 
 nav {
   background-color: #333;
+  border-top: 1px solid #444;
 }
-footer {
-  background-color: #191919;
+.navlink {
+  color: #888;
 }
-
 .navlink.active {
   background-color: #222;
+  color: #fff;
+}
+.navlink .material-icons {
+  color: #888;
+}
+.navlink.active .material-icons {
+  color: #D6264F;
 }
 
 .playbackbutton,
-footer em {
+.module.info a,
+.module.info em {
   color: #D6264F;
 }
 .module.alarm input,
@@ -56,6 +64,7 @@ form.pending .submit {
   color: #888;
 }
 
+.module.info h2,
 .radiostatus .title,
 .time {
   color: #FFBC42;

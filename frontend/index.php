@@ -198,6 +198,12 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                     Alarm
                 </div>
             </span>
+            <span class="navlink info">
+                <span class="material-icons">info</span>
+                <div class="label">
+                    Info
+                </div>
+            </span>
         </nav>
 
         <main>
@@ -450,18 +456,25 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
         </form>
         </div>
 
+        <div class="module info">
+            <div class="info-module">
+                <h2>radiopi</h2>
+                <p>
+                    <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
+                    can play web radio.
+                </p>
+                <p>
+                    Made with love by <a href="https://philippmoers.de">Flipsi</a>.
+                </p>
+                <p>
+                    Hosted on <em><?php echo $hostname; ?></em>.
+                </p>
+            </div>
+        </div>
+
         </main>
 
-        <footer>
-            <span>
-                <em><a href="https://github.com/sflip/radiopi">radiopi</a></em>
-                made by
-                <a href="https://philippmoers.de">Flipsi</a>
-            </span>
-            <span>
-                hosted on <em><?php echo $hostname; ?></em>
-            </span>
-        </footer>
+        <footer></footer>
 
     </body>
 </html>

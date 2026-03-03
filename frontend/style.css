@@ -11,10 +11,13 @@ body {
   display: flex; /* This is important for the footer to stay at the bottom */
   flex-direction: column;
   font-family: 'Krona One', Arial, sans-serif;
-  font-size: 14px;'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
   line-height: 1.4em;
   font-weight: 300;
   padding: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 a {
@@ -109,34 +112,39 @@ input[type=range]::-ms-track {
 
 nav {
   position: fixed;
+  bottom: 0;
   width: 100%;
-  min-height: 60px;
+  min-height: 65px;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
+  z-index: 100;
 }
 
 .navlink {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 10px 0;
+  cursor: pointer;
 }
 
 .navlink .material-icons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 20px;
-  font-size: 36px;
+  font-size: 28px;
 }
 .navlink .label {
-  margin: 22px;
+  font-size: 10px;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 main {
-  padding: 80px 10px 40px 10px;
-  margin-bottom: 30px;
+  padding: 20px 15px 100px 15px;
+  margin-bottom: 0;
 }
 
 main > .module {

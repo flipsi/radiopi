@@ -4,40 +4,47 @@ document.addEventListener("DOMContentLoaded", function(){
 
   const navlinkRadio = document.querySelector('.navlink.radio');
   const navlinkAlarm = document.querySelector('.navlink.alarm');
+  const navlinkInfo  = document.querySelector('.navlink.info');
   const moduleRadio = document.querySelector('.module.radio');
   const moduleAlarm = document.querySelector('.module.alarm');
+  const moduleInfo  = document.querySelector('.module.info');
 
   function showModule(moduleName) {
+    [navlinkRadio, navlinkAlarm, navlinkInfo].forEach(nl => nl.classList.remove(active));
+    [moduleRadio, moduleAlarm, moduleInfo].forEach(m => m.classList.remove(active));
+
     switch (moduleName) {
       case 'radio':
         navlinkRadio.classList.add(active);
-        navlinkAlarm.classList.remove(active);
         moduleRadio.classList.add(active);
-        moduleAlarm.classList.remove(active);
         break;
       case 'alarm':
-        navlinkRadio.classList.remove(active);
         navlinkAlarm.classList.add(active);
-        moduleRadio.classList.remove(active);
         moduleAlarm.classList.add(active);
+        break;
+      case 'info':
+        navlinkInfo.classList.add(active);
+        moduleInfo.classList.add(active);
         break;
       default:
         console.error('Unknown module', moduleName);
     }
+    window.location.hash = moduleName;
   }
 
   function addNavigationEventHandler() {
-    navlinkRadio.addEventListener('click', e => {
-      showModule('radio');
-      window.location.hash = 'radio';
-    });
-    navlinkAlarm.addEventListener('click', e => {
-      showModule('alarm');
-      window.location.hash = 'alarm';
-    });
+    navlinkRadio.addEventListener('click', e => showModule('radio'));
+    navlinkAlarm.addEventListener('click', e => showModule('alarm'));
+    navlinkInfo.addEventListener('click', e => showModule('info'));
 
-    onSwipeLeft = () => showModule('alarm');
-    onSwipeRight = () => showModule('radio');
+    onSwipeLeft = () => {
+      if (navlinkRadio.classList.contains(active)) showModule('alarm');
+      else if (navlinkAlarm.classList.contains(active)) showModule('info');
+    };
+    onSwipeRight = () => {
+      if (navlinkInfo.classList.contains(active)) showModule('alarm');
+      else if (navlinkAlarm.classList.contains(active)) showModule('radio');
+    };
 
     // detect swipe gestures
     (() => {
