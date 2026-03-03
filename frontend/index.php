@@ -87,7 +87,8 @@ header("Expires: 0"); // Proxies.
 
 
 if (!empty($_POST['action'])) {
-    switch ($_POST['action']) {
+    $action = $_POST['action'];
+    switch ($action) {
         case 'start_playback':
             $station = $_POST['station'];
             exec_radio_script("--non-interactive start '$station' >/dev/null", $action_output, $action_exit_code);
@@ -137,7 +138,11 @@ if (!empty($_POST['action'])) {
     // prevent form resubmission with PRG pattern
     if (empty($errors)) {
         unset($_POST);
-        header('Location: ' . $_SERVER['PHP_SELF']);
+        $fragment = '';
+        if ($action === 'enable_alarm' || $action === 'disable_alarm') {
+            $fragment = '#alarm_list';
+        }
+        header('Location: ' . $_SERVER['PHP_SELF'] . $fragment);
         exit;
     }
 }
@@ -146,7 +151,7 @@ if (!empty($_POST['action'])) {
 exec_radio_script('status', $radio_status_output, $radio_status_exit_code);
 $radio_status = parse_radio_status($radio_status_output);
 
-$default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 'enabled' ? 'alarm' : 'radio';
+$default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 'enabled' ? 'alarm_list' : 'radio';
 
 ?>
 
