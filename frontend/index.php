@@ -215,7 +215,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 <div class="title"><?php echo $radio_status['Station']; ?></div>
             </div>
             <div class="block equaliser-container">
-            <?php for ($i = 0; $i < 9; $i++) { ?>
+            <?php for ($i = 0; $i < 24; $i++) { ?>
                 <ol class="equaliser-column">
                     <li class="colour-bar"></li>
                 </ol>
