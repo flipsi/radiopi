@@ -199,6 +199,26 @@ input[type='submit'] {
   margin-left: 10px;
 }
 
+.day-selectors {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.day-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.day-selector label {
+  font-size: 0.8em;
+  margin-bottom: 5px;
+}
+.day-selector input {
+  margin-right: 0;
+  width: 20px;
+  height: 20px;
+}
+
 footer {
   position: fixed;
   bottom: 0;

@@ -464,9 +464,11 @@ function _echo_alarm_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
         TIME=$(gawk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
+        DAYS=$(gawk "/start.*$ALARM_CRON_ID/ {print \$5}" < "$TMP_CRONTAB_FILE")
         if [[ -n "$TIME" ]]; then
             echo "Alarm: enabled"
             echo "Alarm time: $TIME"
+            echo "Alarm days: $DAYS"
         else
             echo "Alarm: disabled"
         fi
@@ -635,8 +637,8 @@ function _main() {
                         DURATION="$ALARM_DEFAULT_DURATION"
                     fi
                     DAY_OF_WEEK="${5:-*}"   # default to every day
-                    if [[ ! "$DAY_OF_WEEK" =~ ^(\*|[0-7])$ ]]; then
-                        echo "ERROR: Day of week must be between 0 and 7 (inclusive) or '*' for every day."
+                    if [[ ! "$DAY_OF_WEEK" =~ ^(\*|[0-7,*-]+)$ ]]; then
+                        echo "ERROR: Day of week must be '*' or consist of 0-7, comma, or dash."
                         exit 1
                     fi
                     _enable_alarm "$2" "$3" "$DURATION" "$DAY_OF_WEEK"

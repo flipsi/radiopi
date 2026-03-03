@@ -41,6 +41,10 @@ footer em {
   border-color: #D6264F;
 }
 
+.day-selector input[type="checkbox"] {
+  accent-color: #D6264F;
+}
+
 form.pending .playbackbutton {
   color: #999;
 }

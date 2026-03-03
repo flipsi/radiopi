@@ -52,10 +52,18 @@ function exec_radio_script($arguments, &$output, &$exit_code) {
 }
 
 function parse_radio_status($radio_status_output) {
-    $radio_status = array();
+    $radio_status = array(
+        'Status' => 'off',
+        'Alarm' => 'disabled',
+        'Timer' => 'disabled',
+        'Volume' => '100',
+        'Alarm days' => '*',
+    );
     foreach ($radio_status_output as $line) {
         $split = explode(': ', $line, 2);
-        $radio_status[$split[0]] = $split[1];
+        if (count($split) === 2) {
+            $radio_status[$split[0]] = $split[1];
+        }
     }
     return $radio_status;
 }
@@ -98,7 +106,13 @@ if (!empty($_POST['action'])) {
             $hour = $alarmtime_matches[1];
             $minute = $alarmtime_matches[2];
             $duration = $alarmduration_matches[1];
-            exec_radio_script("enable $hour $minute $duration", $action_output, $action_exit_code);
+            $days = '*';
+            if (!empty($_POST['alarmdays'])) {
+                if (count($_POST['alarmdays']) < 7) {
+                    $days = implode(',', $_POST['alarmdays']);
+                }
+            }
+            exec_radio_script("enable $hour $minute $duration '$days'", $action_output, $action_exit_code);
             break;
         case 'disable_alarm':
             exec_radio_script("disable", $action_output, $action_exit_code);
@@ -304,6 +318,36 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 Alarm is set to
                 <span class="time"><?php echo $radio_status['Alarm time']; ?></span>.
             </div>
+            <div class="block status">
+                Days: <span class="days">
+                    <?php
+                        if ($radio_status['Alarm days'] === '*') {
+                            echo 'Every day';
+                        } else {
+                            $days_map = array(
+                                '1' => 'Mon',
+                                '2' => 'Tue',
+                                '3' => 'Wed',
+                                '4' => 'Thu',
+                                '5' => 'Fri',
+                                '6' => 'Sat',
+                                '7' => 'Sun',
+                                '0' => 'Sun'
+                            );
+                            $day_parts = explode(',', $radio_status['Alarm days']);
+                            $day_names = array();
+                            foreach ($day_parts as $part) {
+                                if (isset($days_map[$part])) {
+                                    $day_names[] = $days_map[$part];
+                                } else {
+                                    $day_names[] = $part;
+                                }
+                            }
+                            echo implode(', ', $day_names);
+                        }
+                    ?>
+                </span>.
+            </div>
             <div class="block">
                 <input type="hidden" name="action" value="disable_alarm" />
                 <div class="submit">
@@ -324,6 +368,25 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
             <div class="block spread">
                 <label for="alarmduration">Duration in minutes:</label>
                 <input type="number" min="1" max="150" id="alarmduration" name="alarmduration" value="60" />
+            </div>
+            <div class="block">
+                <label>Days:</label>
+                <div class="day-selectors">
+                    <?php
+                        $days_map = array(
+                            '1' => 'Mon',
+                            '2' => 'Tue',
+                            '3' => 'Wed',
+                            '4' => 'Thu',
+                            '5' => 'Fri',
+                            '6' => 'Sat',
+                            '0' => 'Sun'
+                        );
+                        foreach ($days_map as $value => $label) {
+                            echo "<div class='day-selector'><label for='day$value'>$label</label><input type='checkbox' id='day$value' name='alarmdays[]' value='$value' checked /></div>";
+                        }
+                    ?>
+                </div>
             </div>
             <div class="block">
                 <div class="submit">
