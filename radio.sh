@@ -465,7 +465,7 @@ function _echo_alarm_status() {
         _open_crontab
         # Get lines that match ALARM_CRON_LINE and the 'start' command
         IFS=$'\n'
-        ALARM_LINES=($(grep "$ALARM_CRON_LINE" "$TMP_CRONTAB_FILE" | grep "start"))
+        ALARM_LINES=($(grep "$ALARM_CRON_LINE" "$TMP_CRONTAB_FILE" 2>/dev/null | grep "start" || true))
         if [[ ${#ALARM_LINES[@]} -gt 0 ]]; then
             echo "Alarm: enabled"
             for line in "${ALARM_LINES[@]}"; do
@@ -476,7 +476,7 @@ function _echo_alarm_status() {
                 DOW=$(echo "$line" | gawk '{print $5}')
                 ID=$(echo "$line" | gawk -v id="$ALARM_CRON_LINE" '{match($0, id " ([0-9]+)", m); print m[1]}')
                 if [[ -z "$ID" ]]; then ID="old"; fi
-                STATION=$(echo "$line" | gawk '{if (match($0, /-w '\''([^'\'']*)'\''/, m)) print m[1]; else if (match($0, /-w -r/)) print "random"}')
+                STATION=$(echo "$line" | gawk '{if (match($0, /-w '\''([^'\'']*)'\''/, m)) print m[1]; else if (match($0, /-r -w/)) print "random"; else print "random"}')
                 echo "Alarm ID $ID: $HOUR:$MINUTE ($DOW) Station: $STATION"
             done
         else
