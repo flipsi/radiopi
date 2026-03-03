@@ -4,9 +4,14 @@ body {
 }
 
 h1,
-.radiostatus,
-.title {
+h2 {
   color: #888;
+}
+
+.module.info h2,
+.currently_playing .station,
+.time {
+  color: #FFBC42;
 }
 
 input,
@@ -47,11 +52,11 @@ nav {
 }
 .module.alarm input,
 .module.alarm select {
-  border-color: #D6264F;
+  border-color: #FFBC42;
 }
 
 .day-selector input[type="checkbox"] {
-  accent-color: #D6264F;
+  accent-color: #FFBC42;
 }
 
 form.pending .playbackbutton {
@@ -62,12 +67,6 @@ form.pending .submit {
   background-color: #333;
   border-color: #333;
   color: #888;
-}
-
-.module.info h2,
-.radiostatus .title,
-.time {
-  color: #FFBC42;
 }
 
 input[type=range] {

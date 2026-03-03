@@ -31,6 +31,9 @@ h1 {
   margin-bottom: 1em;
   margin-left: 0;
 }
+h2 {
+  margin-bottom: 1.5em;
+}
 
 input,
 select {
@@ -161,9 +164,6 @@ main > .module.active {
 .block.title {
   margin-bottom: 20px;
 }
-.add-alarm-title {
-  margin-top: 70px !important;
-}
 
 .block.spread {
   display: flex;
@@ -197,18 +197,8 @@ main > .module.active {
   min-width: 18em;
 }
 
-.radiostatus,
-.timer .title,
-input[type='submit'] {
-  font-size: 1.2em;
-  line-height: 1.8;
-}
-.radiostatus .title {
-  font-size: 1.5em;
-}
-.alarm .title {
-  font-size: 1.5em;
-  margin-top: 15px;
+.currently_playing .station {
+  font-size: 1.8em;
 }
 
 .active-alarm .time {
@@ -264,7 +254,7 @@ footer span:last-child {
 .equaliser-container {
     height: 50px;
     width: 100%;
-    margin: 0 0 20px 0;
+    margin: 30px 0 30px 0;
     padding: 0;
     position: relative;
     display: flex;

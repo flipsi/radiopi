@@ -219,9 +219,9 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
 
         ?>
 
-            <div class="block radiostatus">
-                Currently playing:
-                <div class="title"><?php echo $radio_status['Station']; ?></div>
+            <div class="block currently_playing">
+                <h2>Currently playing:</h2>
+                <div class="station"><?php echo $radio_status['Station']; ?></div>
             </div>
             <div class="block equaliser-container">
             <?php for ($i = 0; $i < 24; $i++) { ?>
@@ -257,9 +257,8 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 </div>
             </div>
             <div class="block timer">
-                <div class="block title">
-                    Sleep Timer
-                </div>
+
+                <h2>Sleep Timer</h2>
 
                 <form name="timer_form" action="" method="post">
 
@@ -302,9 +301,9 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
         ?>
 
             <div class="block radiostatus">
-                Radio stations:
-            </div>
-            <div class="block">
+
+                <h2>Radio stations:</h2>
+
                 <?php if ($radio_station_list_exit_code > 0 || sizeof($radio_station_list) === 0) {
                     echo "Sorry, could not get any station.";
                 } else { ?>
@@ -337,9 +336,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
 
         <?php if ($radio_status['Alarm'] === 'enabled') { ?>
 
-            <div class="block title">
-                Active Alarms
-            </div>
+            <h2>Active Alarms</h2>
 
             <?php
                 $days_map = array(
@@ -399,9 +396,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
 
         <div class="module alarm_add">
 
-        <div class="block title">
-            Add new alarm
-        </div>
+        <h2>Add new alarm</h2>
 
         <form name="alarm_form" action="" method="post">
             <div class="block spread">
