@@ -20,17 +20,17 @@ $SELF - play some web radio
 
 SYNOPSIS
 
-    $SELF [OPTIONS]       [QUERY|URL]   Start radio (synchronously).
-    $SELF [OPTIONS] start [QUERY|URL]   Start radio (in the background).
-    $SELF stop                          Stop radio.
-    $SELF sleep <D>                     Stop radio in <D> minutes.
-    $SELF nosleep                       Remove scheduled timer.
-    $SELF status                        Print information about currently played station.
-    $SELF list                          List available radio stations (hardcoded in this script).
-    $SELF volume [[+-]<num>]            Set (or get) audio volume (get has a known bug).
-    $SELF enable <H> <M> [<D> [<DOW>]]  Schedule alarm at <Hour>:<Minute> (for <Duration> mins) on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day).
-    $SELF disable [<ID>]                Remove scheduled alarm (all or by ID).
-    $SELF help                          Print this help message.
+    $SELF [OPTIONS]       [QUERY|URL]           Start radio (synchronously).
+    $SELF [OPTIONS] start [QUERY|URL]           Start radio (in the background).
+    $SELF stop                                  Stop radio.
+    $SELF sleep <D>                             Stop radio in <D> minutes.
+    $SELF nosleep                               Remove scheduled timer.
+    $SELF status                                Print information about currently played station.
+    $SELF list                                  List available radio stations (hardcoded in this script).
+    $SELF volume [[+-]<num>]                    Set (or get) audio volume (get has a known bug).
+    $SELF enable <H> <M> [<D> [<DOW> [<S>]]]    Schedule alarm at <Hour>:<Minute> for <Duration> mins on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day) with station <S> (or random if omitted).
+    $SELF disable [<ID>]                        Remove scheduled alarm (all or by ID).
+    $SELF help                                  Print this help message.
 
 DESCRIPTION
 
@@ -476,7 +476,8 @@ function _echo_alarm_status() {
                 DOW=$(echo "$line" | gawk '{print $5}')
                 ID=$(echo "$line" | gawk -v id="$ALARM_CRON_LINE" '{match($0, id " ([0-9]+)", m); print m[1]}')
                 if [[ -z "$ID" ]]; then ID="old"; fi
-                echo "Alarm ID $ID: $HOUR:$MINUTE ($DOW)"
+                STATION=$(echo "$line" | gawk '{if (match($0, /-w '\''([^'\'']*)'\''/, m)) print m[1]; else if (match($0, /-w -r/)) print "random"}')
+                echo "Alarm ID $ID: $HOUR:$MINUTE ($DOW) Station: $STATION"
             done
         else
             echo "Alarm: disabled"
@@ -514,26 +515,34 @@ function _enable_alarm() {
     local ALPHA_MINUTE="$2"
     local DURATION="$3"
     local DAY_OF_WEEK="$4"
+    local STATION="$5"
     local OMEGA_HOUR
     local OMEGA_MINUTE
     OMEGA_HOUR=$(  date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%H')
     OMEGA_MINUTE=$(date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%M')
-    
+
     _open_crontab
-    
+
     # Generate new ID
     local LAST_ID=$(gawk -v id="$ALARM_CRON_LINE" 'match($0, id " ([0-9]+)", m) {if (m[1] > max) max = m[1]} END {print max}' "$TMP_CRONTAB_FILE")
     local NEW_ID=$((LAST_ID + 1))
-    
-    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD start -r -w >>\$RADIO_LOG 2>&1 # $ALARM_CRON_LINE $NEW_ID"
+
+    local START_ARGS
+    if [[ -z "$STATION" ]]; then
+        START_ARGS="-w -r"
+    else
+        START_ARGS="-w '$STATION'"
+    fi
+
+    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD start $START_ARGS >>\$RADIO_LOG 2>&1 # $ALARM_CRON_LINE $NEW_ID"
     OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD stop        >>\$RADIO_LOG 2>&1 # $ALARM_CRON_LINE $NEW_ID"
-    
+
     _append_once "$TMP_CRONTAB_FILE" "RADIO_CMD=$DIR/$SELF"
     _append_once "$TMP_CRONTAB_FILE" "RADIO_LOG=$STATEDIR/radio.log"
     _append_once "$TMP_CRONTAB_FILE" "$ALPHA_LINE"
     _append_once "$TMP_CRONTAB_FILE" "$OMEGA_LINE"
     _close_crontab
-    
+
     echo "Scheduled alarm ID $NEW_ID for $ALPHA_HOUR:$ALPHA_MINUTE on day(s) $DAY_OF_WEEK."
 
     if ! pgrep crond >/dev/null; then
@@ -664,7 +673,8 @@ function _main() {
                         echo "ERROR: Day of week must be '*' or consist of 0-7, comma, or dash."
                         exit 1
                     fi
-                    _enable_alarm "$2" "$3" "$DURATION" "$DAY_OF_WEEK"
+                    STATION="$6"
+                    _enable_alarm "$2" "$3" "$DURATION" "$DAY_OF_WEEK" "$STATION"
                     exit 0
                 else
                     echo "ERROR: Hour and minute required as separate arguments."

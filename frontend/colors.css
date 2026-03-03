@@ -9,7 +9,8 @@ h1,
   color: #888;
 }
 
-input {
+input,
+select {
   background-color: #ddd;
   color: #222;
 }
@@ -36,7 +37,8 @@ footer {
 footer em {
   color: #D6264F;
 }
-.module.alarm input {
+.module.alarm input,
+.module.alarm select {
   border-color: #D6264F;
 }
 
@@ -120,7 +122,6 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
   background: #D6264F;
 }
-
 
 .errors {
   color: #911;

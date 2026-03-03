@@ -65,9 +65,12 @@ function parse_radio_status($radio_status_output) {
             $key = $split[0];
             $value = $split[1];
             if (strpos($key, 'Alarm ID') === 0) {
+                // value looks like: "7:0 (1-5) Station: random"
+                preg_match('/(.*) Station: (.*)/', $value, $matches);
                 $radio_status['Alarm list'][] = array(
                     'id' => substr($key, 9),
-                    'status' => $value
+                    'status' => $matches[1],
+                    'station' => $matches[2]
                 );
                 $radio_status['Alarm'] = 'enabled';
             } else {
@@ -122,7 +125,8 @@ if (!empty($_POST['action'])) {
                     $days = implode(',', $_POST['alarmdays']);
                 }
             }
-            exec_radio_script("enable $hour $minute $duration '$days'", $action_output, $action_exit_code);
+            $station = isset($_POST['alarmstation']) ? $_POST['alarmstation'] : '';
+            exec_radio_script("enable $hour $minute $duration '$days' '$station'", $action_output, $action_exit_code);
             break;
         case 'disable_alarm':
             $id = isset($_POST['id']) ? $_POST['id'] : '';
@@ -355,6 +359,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                         <div class="status">
                             <span class="time"><?php echo $time; ?></span>
                             <div class="days-label"><?php echo $days_str; ?></div>
+                            <div class="station-label">Station: <?php echo $alarm['station']; ?></div>
                         </div>
                         <div class="submit">
                             <span class="material-icons playbackbutton">close</span>
@@ -395,6 +400,18 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 <label for="alarmduration">Duration in minutes:</label>
                 <input type="number" min="1" max="150" id="alarmduration" name="alarmduration" value="60" />
             </div>
+            <div class="block spread">
+                <label for="alarmstation">Station:</label>
+                <select id="alarmstation" name="alarmstation">
+                    <option value="">Random</option>
+                    <?php
+                        exec_radio_script('list', $stations_for_alarm, $stations_exit_code);
+                        foreach ($stations_for_alarm as $station) {
+                            echo "<option value='$station'>$station</option>";
+                        }
+                    ?>
+                </select>
+            </div>
             <div class="block">
                 <label>Days:</label>
                 <div class="day-selectors">
@@ -426,7 +443,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 <p>
                 The alarm will start at low volume, which will increase over time.
                 </p><p>
-                The alarm will start with a random radio station. Picking a certain one is currently not supported.
+                The alarm will start with the specified radio station, or a random one if "Random" is selected.
                 </p>
             </div>
 

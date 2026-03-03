@@ -29,7 +29,8 @@ h1 {
   margin-left: 0;
 }
 
-input {
+input,
+select {
   box-sizing: border-box;
   min-height: 35px;
   padding: 6px 10px;
@@ -231,7 +232,8 @@ input[type='submit'] {
   margin-bottom: 15px;
 }
 
-.days-label {
+.days-label,
+.station-label {
   font-size: 0.8em;
 }
 
