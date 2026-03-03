@@ -57,12 +57,22 @@ function parse_radio_status($radio_status_output) {
         'Alarm' => 'disabled',
         'Timer' => 'disabled',
         'Volume' => '100',
-        'Alarm days' => '*',
+        'Alarm list' => array(),
     );
     foreach ($radio_status_output as $line) {
         $split = explode(': ', $line, 2);
         if (count($split) === 2) {
-            $radio_status[$split[0]] = $split[1];
+            $key = $split[0];
+            $value = $split[1];
+            if (strpos($key, 'Alarm ID') === 0) {
+                $radio_status['Alarm list'][] = array(
+                    'id' => substr($key, 9),
+                    'status' => $value
+                );
+                $radio_status['Alarm'] = 'enabled';
+            } else {
+                $radio_status[$key] = $value;
+            }
         }
     }
     return $radio_status;
@@ -115,7 +125,8 @@ if (!empty($_POST['action'])) {
             exec_radio_script("enable $hour $minute $duration '$days'", $action_output, $action_exit_code);
             break;
         case 'disable_alarm':
-            exec_radio_script("disable", $action_output, $action_exit_code);
+            $id = isset($_POST['id']) ? $_POST['id'] : '';
+            exec_radio_script("disable $id", $action_output, $action_exit_code);
             break;
         default:
     }
@@ -294,7 +305,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                         <?php foreach ($radio_station_list as $station) { ?>
                         <li class="stationlink">
                             <span class="material-icons playbackbutton">play_circle_outline</span>
-                            <span class="title"><?php echo $station; ?></span>
+                            <span class="station"><?php echo $station; ?></span>
                         </li>
                         <?php } ?>
                         </ul>
@@ -310,57 +321,72 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
         </div>
 
         <div class="module alarm <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
-        <form name="alarm_form" action="" method="post">
 
         <?php if ($radio_status['Alarm'] === 'enabled') { ?>
 
-            <div class="block status">
-                Alarm is set to
-                <span class="time"><?php echo $radio_status['Alarm time']; ?></span>.
+            <div class="block title">
+                Active Alarms
             </div>
-            <div class="block status">
-                Days: <span class="days">
-                    <?php
-                        if ($radio_status['Alarm days'] === '*') {
-                            echo 'Every day';
+
+            <?php
+                $days_map = array(
+                    '1' => 'Mon', '2' => 'Tue', '3' => 'Wed', '4' => 'Thu', '5' => 'Fri', '6' => 'Sat', '0' => 'Sun', '*' => 'Every day'
+                );
+
+                foreach ($radio_status['Alarm list'] as $alarm) {
+                    // $alarm['status'] looks like "7:0 (1-5)"
+                    preg_match('/(.*) \((.*)\)/', $alarm['status'], $matches);
+                    $time = $matches[1];
+                    $days_raw = $matches[2];
+                    $days_formatted = array();
+                    foreach (explode(',', $days_raw) as $part) {
+                        if (isset($days_map[$part])) {
+                            $days_formatted[] = $days_map[$part];
                         } else {
-                            $days_map = array(
-                                '1' => 'Mon',
-                                '2' => 'Tue',
-                                '3' => 'Wed',
-                                '4' => 'Thu',
-                                '5' => 'Fri',
-                                '6' => 'Sat',
-                                '7' => 'Sun',
-                                '0' => 'Sun'
-                            );
-                            $day_parts = explode(',', $radio_status['Alarm days']);
-                            $day_names = array();
-                            foreach ($day_parts as $part) {
-                                if (isset($days_map[$part])) {
-                                    $day_names[] = $days_map[$part];
-                                } else {
-                                    $day_names[] = $part;
-                                }
-                            }
-                            echo implode(', ', $day_names);
+                            $days_formatted[] = $part; // Fallback for ranges like 1-5
                         }
-                    ?>
-                </span>.
-            </div>
-            <div class="block">
-                <input type="hidden" name="action" value="disable_alarm" />
-                <div class="submit">
-                    <span class="material-icons playbackbutton">close</span>
-                    Disable alarm
-                </div>
+                    }
+                    $days_str = implode(', ', $days_formatted);
+            ?>
+                <form class="active-alarm" name="alarm_disable_form_<?php echo $alarm['id']; ?>" action="" method="post">
+                    <input type="hidden" name="action" value="disable_alarm" />
+                    <input type="hidden" name="id" value="<?php echo $alarm['id']; ?>" />
+                    <div class="block spread active-alarm-row">
+                        <div class="status">
+                            <span class="time"><?php echo $time; ?></span>
+                            <div class="days-label"><?php echo $days_str; ?></div>
+                        </div>
+                        <div class="submit">
+                            <span class="material-icons playbackbutton">close</span>
+                            Disable
+                        </div>
+                    </div>
+                </form>
+            <?php } ?>
+
+            <div class="block disable-all-container">
+                <form name="disable_all_alarms_form" action="" method="post">
+                    <input type="hidden" name="action" value="disable_alarm" />
+                    <div class="submit">
+                        <span class="material-icons playbackbutton">delete_sweep</span>
+                        Disable all alarms
+                    </div>
+                </form>
             </div>
 
         <?php } else { ?>
 
             <div class="block status">
-                Alarm is disabled.
+                No alarms set.
             </div>
+
+        <?php } ?>
+
+        <div class="block title add-alarm-title">
+            Add new alarm
+        </div>
+
+        <form name="alarm_form" action="" method="post">
             <div class="block spread">
                 <label for="alarmtime">Alarm time:</label>
                 <input type="time" id="alarmtime" name="alarmtime" value="08:00" />
@@ -395,8 +421,6 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                     Set alarm
                 </div>
             </div>
-
-        <?php } ?>
 
             <div class="block">
                 <p>

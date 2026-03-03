@@ -147,8 +147,15 @@ main > .module.active {
 
 .block {
   margin-top: 6px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
+.block.title {
+  margin-bottom: 20px;
+}
+.add-alarm-title {
+  margin-top: 70px !important;
+}
+
 .block.spread {
   display: flex;
   justify-content: space-between;
@@ -182,7 +189,6 @@ main > .module.active {
 }
 
 .radiostatus,
-.module.alarm .status,
 .timer .title,
 input[type='submit'] {
   font-size: 1.2em;
@@ -191,12 +197,13 @@ input[type='submit'] {
 .radiostatus .title {
   font-size: 1.5em;
 }
-.timer .title {
-  margin-top: 40px;
+.alarm .title {
+  font-size: 1.5em;
+  margin-top: 15px;
 }
 
-#alarmtime {
-  margin-left: 10px;
+.active-alarm .time {
+  font-size: 1.5em;
 }
 
 .day-selectors {
@@ -217,6 +224,15 @@ input[type='submit'] {
   margin-right: 0;
   width: 20px;
   height: 20px;
+}
+
+.active-alarm-row {
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.days-label {
+  font-size: 0.8em;
 }
 
 footer {

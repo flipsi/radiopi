@@ -29,7 +29,7 @@ SYNOPSIS
     $SELF list                          List available radio stations (hardcoded in this script).
     $SELF volume [[+-]<num>]            Set (or get) audio volume (get has a known bug).
     $SELF enable <H> <M> [<D> [<DOW>]]  Schedule alarm at <Hour>:<Minute> (for <Duration> mins) on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day).
-    $SELF disable                       Remove scheduled alarm.
+    $SELF disable [<ID>]                Remove scheduled alarm (all or by ID).
     $SELF help                          Print this help message.
 
 DESCRIPTION
@@ -113,8 +113,8 @@ VLC_RC_HOST=localhost
 VLC_RC_PORT=9592 # hardcoded because using lsof (_find_unused_port) may be problematic
 
 # suffixes appended to crontab line, will be grepped for and matched lines will be deleted!
-ALARM_CRON_ID="MANAGED RADIO ALARM CRON"
-TIMER_CRON_ID="MANAGED RADIO TIMER CRON"
+ALARM_CRON_LINE="MANAGED RADIO ALARM CRON"
+TIMER_CRON_LINE="MANAGED RADIO TIMER CRON"
 
 STATEDIR=/tmp/radiopi
 PIDFILE_VLC="$STATEDIR/vlc.pid"
@@ -448,7 +448,7 @@ function _close_crontab() {
 function _echo_timer_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
-        TIME=$(gawk "/stop.*$TIMER_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
+        TIME=$(gawk "/stop.*$TIMER_CRON_LINE/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
         if [[ -n "$TIME" ]]; then
             echo "Timer: enabled"
             echo "Timer set to: $TIME"
@@ -463,12 +463,21 @@ function _echo_timer_status() {
 function _echo_alarm_status() {
     if crontab -l >/dev/null 2>&1; then
         _open_crontab
-        TIME=$(gawk "/start.*$ALARM_CRON_ID/ {print \$2 \":\" \$1}" < "$TMP_CRONTAB_FILE")
-        DAYS=$(gawk "/start.*$ALARM_CRON_ID/ {print \$5}" < "$TMP_CRONTAB_FILE")
-        if [[ -n "$TIME" ]]; then
+        # Get lines that match ALARM_CRON_LINE and the 'start' command
+        IFS=$'\n'
+        ALARM_LINES=($(grep "$ALARM_CRON_LINE" "$TMP_CRONTAB_FILE" | grep "start"))
+        if [[ ${#ALARM_LINES[@]} -gt 0 ]]; then
             echo "Alarm: enabled"
-            echo "Alarm time: $TIME"
-            echo "Alarm days: $DAYS"
+            for line in "${ALARM_LINES[@]}"; do
+                # Extract minute, hour, day-of-week
+                # Line format: min hour * * dow command # ALARM_CRON_LINE [ID]
+                MINUTE=$(echo "$line" | gawk '{print $1}')
+                HOUR=$(echo "$line" | gawk '{print $2}')
+                DOW=$(echo "$line" | gawk '{print $5}')
+                ID=$(echo "$line" | gawk -v id="$ALARM_CRON_LINE" '{match($0, id " ([0-9]+)", m); print m[1]}')
+                if [[ -z "$ID" ]]; then ID="old"; fi
+                echo "Alarm ID $ID: $HOUR:$MINUTE ($DOW)"
+            done
         else
             echo "Alarm: disabled"
         fi
@@ -481,7 +490,7 @@ function _set_sleep_timer() {
     local DURATION="$1"
     HOUR=$(  date -d "$DURATION minutes" +'%H')
     MINUTE=$(date -d "$DURATION minutes" +'%M')
-    STOP_LINE="$MINUTE $HOUR * * * \$RADIO_CMD stop >>\$RADIO_LOG 2>&1 # $TIMER_CRON_ID"
+    STOP_LINE="$MINUTE $HOUR * * * \$RADIO_CMD stop >>\$RADIO_LOG 2>&1 # $TIMER_CRON_LINE"
     _open_crontab
     _disable_timer_inner
     _append_once "$TMP_CRONTAB_FILE" "RADIO_CMD=$DIR/$SELF"
@@ -509,38 +518,52 @@ function _enable_alarm() {
     local OMEGA_MINUTE
     OMEGA_HOUR=$(  date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%H')
     OMEGA_MINUTE=$(date -d "$ALPHA_HOUR:$ALPHA_MINUTE $DURATION minutes" +'%M')
-    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD start -r -w >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
-    OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD stop        >>\$RADIO_LOG 2>&1 # $ALARM_CRON_ID"
+    
     _open_crontab
-    _disable_alarm_inner
+    
+    # Generate new ID
+    local LAST_ID=$(gawk -v id="$ALARM_CRON_LINE" 'match($0, id " ([0-9]+)", m) {if (m[1] > max) max = m[1]} END {print max}' "$TMP_CRONTAB_FILE")
+    local NEW_ID=$((LAST_ID + 1))
+    
+    ALPHA_LINE="$ALPHA_MINUTE $ALPHA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD start -r -w >>\$RADIO_LOG 2>&1 # $ALARM_CRON_LINE $NEW_ID"
+    OMEGA_LINE="$OMEGA_MINUTE $OMEGA_HOUR * * $DAY_OF_WEEK \$RADIO_CMD stop        >>\$RADIO_LOG 2>&1 # $ALARM_CRON_LINE $NEW_ID"
+    
     _append_once "$TMP_CRONTAB_FILE" "RADIO_CMD=$DIR/$SELF"
     _append_once "$TMP_CRONTAB_FILE" "RADIO_LOG=$STATEDIR/radio.log"
     _append_once "$TMP_CRONTAB_FILE" "$ALPHA_LINE"
     _append_once "$TMP_CRONTAB_FILE" "$OMEGA_LINE"
     _close_crontab
-    if [[ "$DAY_OF_WEEK" = "*" ]]; then
-        echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE."
-    else
-        echo "Scheduled alarm for $ALPHA_HOUR:$ALPHA_MINUTE at day(s) $DAY_OF_WEEK of the week."
-    fi
+    
+    echo "Scheduled alarm ID $NEW_ID for $ALPHA_HOUR:$ALPHA_MINUTE on day(s) $DAY_OF_WEEK."
+
     if ! pgrep crond >/dev/null; then
         echo "WARNING: Make sure your cron service is running!"
     fi
 }
 
 function _disable_alarm() {
+    local ID="$1"
     _open_crontab
-    _disable_alarm_inner
+    _disable_alarm_inner "$ID"
     _close_crontab
-    echo "Removed scheduled alarm."
+    if [[ -n "$ID" ]]; then
+        echo "Removed scheduled alarm ID $ID."
+    else
+        echo "Removed all scheduled alarms."
+    fi
 }
 
 function _disable_alarm_inner() {
-    gawk -i inplace -v rmv="$ALARM_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+    local ID="$1"
+    local PATTERN="$ALARM_CRON_LINE"
+    if [[ -n "$ID" ]]; then
+        PATTERN="$ALARM_CRON_LINE $ID"
+    fi
+    gawk -i inplace -v rmv="$PATTERN" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
 }
 
 function _disable_timer_inner() {
-    gawk -i inplace -v rmv="$TIMER_CRON_ID" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+    gawk -i inplace -v rmv="$TIMER_CRON_LINE" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
 }
 
 function _main() {
@@ -650,7 +673,7 @@ function _main() {
                 ;;
             disable)
                 require crontab
-                _disable_alarm
+                _disable_alarm "$2"
                 exit 0
                 ;;
             *)

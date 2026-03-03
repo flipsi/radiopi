@@ -37,12 +37,6 @@ ENV WWW_DATA_GID=33
 COPY custom.php.ini /usr/local/etc/php/conf.d/99-custom.php.ini
 RUN touch /var/log/php_errors.log && chown $WWW_DATA_UID:$WWW_DATA_GID /var/log/php_errors.log
 
-## Copy backend code to document root
-COPY ./radio.sh /opt/radio
-## Copy frontend code to document root
-# COPY ./frontend /var/www/html
-## Mount host folder at runtime instead
-
 ## Configure nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
@@ -54,6 +48,12 @@ RUN touch /etc/crontab.empty && su -l $WWW_DATA_NAME -s /bin/bash -c 'crontab /e
 
 ## Allow audio access for webserver
 RUN usermod -aG audio $WWW_DATA_NAME
+
+## Copy backend code to document root
+COPY ./radio.sh /opt/radio
+## Copy frontend code to document root
+# COPY ./frontend /var/www/html
+## Mount host folder at runtime instead
 
 ## Expose ports
 EXPOSE 80

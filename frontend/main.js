@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function(){
         const searchString = e.target.value.toLowerCase();
         for (let i = 0; i < stationlist.children.length; i++) {
           const station = stationlist.children[i];
-          const title = station.getElementsByClassName('title')[0].innerHTML.toLowerCase();
+          const title = station.getElementsByClassName('station')[0].innerHTML.toLowerCase();
           station.style.display = title.match(searchString) ? 'block' : 'none';
         }
       });
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function(){
     for (let i = 0; i < stationLinks.length; i++) {
       const link = stationLinks[i];
       link.addEventListener('click', e => {
-        const title = link.getElementsByClassName('title')[0].innerText;
+        const title = link.getElementsByClassName('station')[0].innerText;
         stationInput.value = title;
         if (!startPlaybackForm.classList.contains('pending'))
           startPlaybackForm.submit();
