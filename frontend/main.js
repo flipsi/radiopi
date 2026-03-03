@@ -3,30 +3,30 @@ document.addEventListener("DOMContentLoaded", function(){
   const active = 'active';
 
   const navlinkRadio = document.querySelector('.navlink.radio');
-  const navlinkAlarm = document.querySelector('.navlink.alarm');
+  const navlinkAlarmList = document.querySelector('.navlink.alarm_list');
+  const navlinkAlarmAdd = document.querySelector('.navlink.alarm_add');
   const navlinkInfo  = document.querySelector('.navlink.info');
   const moduleRadio = document.querySelector('.module.radio');
-  const moduleAlarm = document.querySelector('.module.alarm');
+  const moduleAlarmList = document.querySelector('.module.alarm_list');
+  const moduleAlarmAdd = document.querySelector('.module.alarm_add');
   const moduleInfo  = document.querySelector('.module.info');
 
-  function showModule(moduleName) {
-    [navlinkRadio, navlinkAlarm, navlinkInfo].forEach(nl => nl.classList.remove(active));
-    [moduleRadio, moduleAlarm, moduleInfo].forEach(m => m.classList.remove(active));
+  const navlinks = [navlinkRadio, navlinkAlarmList, navlinkAlarmAdd, navlinkInfo];
+  const modules = [moduleRadio, moduleAlarmList, moduleAlarmAdd, moduleInfo];
+  const moduleNames = ['radio', 'alarm_list', 'alarm_add', 'info'];
 
-    switch (moduleName) {
-      case 'radio':
-        navlinkRadio.classList.add(active);
-        moduleRadio.classList.add(active);
-        break;
-      case 'alarm':
-        navlinkAlarm.classList.add(active);
-        moduleAlarm.classList.add(active);
-        break;
-      case 'info':
-        navlinkInfo.classList.add(active);
-        moduleInfo.classList.add(active);
-        break;
-      default:
+  function showModule(moduleName) {
+    navlinks.forEach(nl => nl.classList.remove(active));
+    modules.forEach(m => m.classList.remove(active));
+
+    const index = moduleNames.indexOf(moduleName);
+    if (index !== -1) {
+      navlinks[index].classList.add(active);
+      modules[index].classList.add(active);
+    } else if (moduleName === 'alarm') { // Compatibility
+        navlinkAlarmList.classList.add(active);
+        moduleAlarmList.classList.add(active);
+    } else {
         console.error('Unknown module', moduleName);
     }
     window.location.hash = moduleName;
@@ -34,16 +34,19 @@ document.addEventListener("DOMContentLoaded", function(){
 
   function addNavigationEventHandler() {
     navlinkRadio.addEventListener('click', e => showModule('radio'));
-    navlinkAlarm.addEventListener('click', e => showModule('alarm'));
+    navlinkAlarmList.addEventListener('click', e => showModule('alarm_list'));
+    navlinkAlarmAdd.addEventListener('click', e => showModule('alarm_add'));
     navlinkInfo.addEventListener('click', e => showModule('info'));
 
     onSwipeLeft = () => {
-      if (navlinkRadio.classList.contains(active)) showModule('alarm');
-      else if (navlinkAlarm.classList.contains(active)) showModule('info');
+      const current = moduleNames.find(name => document.querySelector(`.module.${name}`).classList.contains(active));
+      const index = moduleNames.indexOf(current);
+      if (index < moduleNames.length - 1) showModule(moduleNames[index + 1]);
     };
     onSwipeRight = () => {
-      if (navlinkInfo.classList.contains(active)) showModule('alarm');
-      else if (navlinkAlarm.classList.contains(active)) showModule('radio');
+      const current = moduleNames.find(name => document.querySelector(`.module.${name}`).classList.contains(active));
+      const index = moduleNames.indexOf(current);
+      if (index > 0) showModule(moduleNames[index - 1]);
     };
 
     // detect swipe gestures

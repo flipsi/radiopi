@@ -188,21 +188,19 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
         <nav>
             <span class="navlink radio <?php echo $default_module === 'radio' ? 'active' : ''; ?>">
                 <span class="material-icons">radio</span>
-                <div class="label">
-                    Radio
-                </div>
+                <div class="label">Radio</div>
             </span>
-            <span class="navlink alarm <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
-                <span class="material-icons">alarm</span>
-                <div class="label">
-                    Alarm
-                </div>
+            <span class="navlink alarm_list <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
+                <span class="material-icons">alarm_on</span>
+                <div class="label">Alarms</div>
+            </span>
+            <span class="navlink alarm_add">
+                <span class="material-icons">alarm_add</span>
+                <div class="label">Add</div>
             </span>
             <span class="navlink info">
                 <span class="material-icons">info</span>
-                <div class="label">
-                    Info
-                </div>
+                <div class="label">Info</div>
             </span>
         </nav>
 
@@ -330,7 +328,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
 
         </div>
 
-        <div class="module alarm <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
+        <div class="module alarm_list <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
 
         <?php if ($radio_status['Alarm'] === 'enabled') { ?>
 
@@ -392,8 +390,11 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
             </div>
 
         <?php } ?>
+        </div>
 
-        <div class="block title add-alarm-title">
+        <div class="module alarm_add">
+
+        <div class="block title">
             Add new alarm
         </div>
 
