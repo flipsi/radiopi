@@ -97,7 +97,8 @@ AUDIO_SRC_FALLBACK="/home/sflip/snd/Mark Ronson feat. Bruno Mars - Uptown Funk.m
 
 # ALSA audio device to use (list with `aplay -L`)
 # If device not found, this will be ignored and default device will be used.
-ALSA_DEVICE="${ALSA_DEVICE:-plughw:CARD=sndrpihifiberry,DEV=0}"
+ALSA_DEVICE="${ALSA_DEVICE:-default}"
+# ALSA_DEVICE="${ALSA_DEVICE:-plughw:CARD=sndrpihifiberry,DEV=0}"
 
 ALARM_DEFAULT_DURATION=60
 
