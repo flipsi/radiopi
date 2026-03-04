@@ -330,6 +330,7 @@ function _start_playback() {
     echo "Now playing $TITLE ($AUDIO_SRC)..."
     echo "Station: $TITLE" > "$STATUSFILE"
     echo "Stream URL: $AUDIO_SRC" >> "$STATUSFILE"
+    echo "VLC_ARGS: ${VLC_ARGS[@]}"
     vlc "${VLC_ARGS[@]}" & echo $! > $PIDFILE_VLC
     if [[ -n "$VOLUME_INCREMENT_ENABLED" ]]; then
         echo "Volume will be incremented successively..."
