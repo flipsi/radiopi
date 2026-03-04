@@ -93,7 +93,7 @@ RADIO_STATION_LIST["WSM AM"]="https://stream01048.westreamradio.com/wsm-am-mp3"
 RADIO_STATION_LIST["WXPN 88.5"]="https://wxpnhi.xpn.org/xpnhi"
 RADIO_STATION_LIST["fip Radio"]="http://direct.fipradio.fr/live/fip-midfi.mp3"
 
-AUDIO_SRC_FALLBACK="/home/sflip/snd/Mark Ronson feat. Bruno Mars - Uptown Funk.mp3"
+AUDIO_SRC_FALLBACK="$HOME/snd/lake-street-dive-better-not-tell-you-live.mp3"
 
 # ALSA audio device to use (list with `aplay -L`)
 # If device not found, this will be ignored and default device will be used.
@@ -170,9 +170,14 @@ function _get_running_radio_port() {
     echo "$PORT"
 }
 
-function _test_audio_stream_url() {
+function _test_audio_source() {
     local URL="$1"
-    # unfortunately doesn't work for some stations
+    # local file
+    if [[ -f "$URL" ]]; then
+        return 0
+    fi
+    # the following checks a web radio url for presence and type.
+    # unfortunately doesn't work for some stations, so I whitelist the ones that I trust work.
     STATION_WHITELIST=(
         "${RADIO_STATION_LIST["1LIVE"]}"
         "${RADIO_STATION_LIST["1LIVE DIGGI"]}"
@@ -295,7 +300,7 @@ function _randomly_set_station() {
     if [[ "$RANDOM_ATTEMPTS" -ge 5 ]]; then
         echo "Maximum attempts reached! Using fallback audio source $AUDIO_SRC_FALLBACK"
         AUDIO_SRC="$AUDIO_SRC_FALLBACK"
-    elif ! _test_audio_stream_url "${RADIO_STATION_LIST[$STATION]}"; then
+    elif ! _test_audio_source "${RADIO_STATION_LIST[$STATION]}"; then
         echo "Station $STATION does not look like an audio source. Trying another one..."
         _randomly_set_station
     else
@@ -307,7 +312,7 @@ function _start_playback() {
     local TITLE="$1"
     local AUDIO_SRC="$2"
     # local VLC_RC_PORT
-    if ! _test_audio_stream_url "$AUDIO_SRC"; then
+    if ! _test_audio_source "$AUDIO_SRC"; then
         echo "ERROR: $AUDIO_SRC does not look like an audio source."
         exit 2
     fi
@@ -382,10 +387,16 @@ function _cleanup_after_playback() {
 
 function _start_radio() {
     local QUERY_OR_URL="$1"
+    # known station
     if [[ -n "$QUERY_OR_URL" && -n "${RADIO_STATION_LIST[$QUERY_OR_URL]}" ]]; then
         AUDIO_SRC="${RADIO_STATION_LIST[$QUERY_OR_URL]}"
         TITLE="$QUERY_OR_URL"
-    elif [[ -n "$QUERY_OR_URL" ]] && _test_audio_stream_url "$QUERY_OR_URL"; then
+    # local file
+    elif [[ -n "$QUERY_OR_URL" && -f "$QUERY_OR_URL" ]]; then
+        AUDIO_SRC="$QUERY_OR_URL"
+        TITLE="$QUERY_OR_URL"
+    # url
+    elif [[ -n "$QUERY_OR_URL" ]] && _test_audio_source "$QUERY_OR_URL"; then
         AUDIO_SRC="$QUERY_OR_URL"
         TITLE="$AUDIO_SRC"
     elif [[ -n "$NON_INTERACTIVE" ]]; then
