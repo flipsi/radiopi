@@ -27,7 +27,7 @@ SYNOPSIS
     $SELF nosleep                               Remove scheduled timer.
     $SELF status                                Print information about currently played station.
     $SELF list                                  List available radio stations (hardcoded in this script).
-    $SELF volume [[+-]<num>]                    Set (or get) audio volume (get has a known bug).
+    $SELF volume [[+-]<num>]                    Set (or get) audio volume (get has a known bug). This will also abort the volume increments in case of the --wake-up functionality.
     $SELF enable <H> <M> [<D> [<DOW> [<S>]]]    Schedule alarm at <Hour>:<Minute> for <Duration> mins on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day) with station <S> (or random if omitted).
     $SELF disable [<ID>]                        Remove scheduled alarm (all or by ID).
     $SELF help                                  Print this help message.
@@ -361,6 +361,21 @@ function _start_playback() {
     fi
 }
 
+function _stop_volume_increment() {
+    if [[ -f $PIDFILE_INC ]]; then
+        PID=$(cat "$PIDFILE_INC")
+        if ps "$PID" >/dev/null; then
+            kill "$PID" && rm "$PIDFILE"
+            echo "Volume increment aborted."
+        else
+            echo "WARNING: No process found with PID $PID to stop volume increment"
+            rm "$PIDFILE"
+        fi
+    else
+        echo "Apparently, volume increment is not running, so no need to abort it."
+    fi
+}
+
 function _stop_playback() {
     for PIDFILE in $PIDFILE_VLC $PIDFILE_INC; do
         if [[ ! -f $PIDFILE ]]; then
@@ -666,6 +681,7 @@ function _main() {
                     else
                         shift
                         _set_vlc_volume "$VOLUME"
+                        _stop_volume_increment
                     fi
                     exit 0
                 else
