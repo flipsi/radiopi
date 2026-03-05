@@ -335,7 +335,7 @@ function _start_playback() {
     echo "Now playing $TITLE ($AUDIO_SRC)..."
     echo "Station: $TITLE" > "$STATUSFILE"
     echo "Stream URL: $AUDIO_SRC" >> "$STATUSFILE"
-    echo "VLC_ARGS: ${VLC_ARGS[@]}"
+    echo "VLC_ARGS: ${VLC_ARGS[*]}"
     vlc "${VLC_ARGS[@]}" & echo $! > $PIDFILE_VLC
     if [[ -n "$VOLUME_INCREMENT_ENABLED" ]]; then
         echo "Volume will be incremented successively..."
@@ -493,7 +493,7 @@ function _echo_alarm_status() {
         _open_crontab
         # Get lines that match ALARM_CRON_LINE and the 'start' command
         IFS=$'\n'
-        ALARM_LINES=($(grep "$ALARM_CRON_LINE" "$TMP_CRONTAB_FILE" 2>/dev/null | grep "start" || true))
+        mapfile -t ALARM_LINES < <(grep -F -- "$ALARM_CRON_LINE" "$TMP_CRONTAB_FILE" 2>/dev/null | grep -F -- "start" || true)
         if [[ ${#ALARM_LINES[@]} -gt 0 ]]; then
             echo "Alarm: enabled"
             for line in "${ALARM_LINES[@]}"; do
@@ -552,7 +552,8 @@ function _enable_alarm() {
     _open_crontab
 
     # Generate new ID
-    local LAST_ID=$(gawk -v id="$ALARM_CRON_LINE" 'match($0, id " ([0-9]+)", m) {if (m[1] > max) max = m[1]} END {print max}' "$TMP_CRONTAB_FILE")
+    local LAST_ID
+    LAST_ID=$(gawk -v id="$ALARM_CRON_LINE" 'match($0, id " ([0-9]+)", m) {if (m[1] > max) max = m[1]} END {print max}' "$TMP_CRONTAB_FILE")
     local NEW_ID=$((LAST_ID + 1))
 
     local START_ARGS
