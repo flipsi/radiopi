@@ -195,7 +195,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                 <span class="material-icons">radio</span>
                 <div class="label">Radio</div>
             </span>
-            <span class="navlink alarm_list <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
+            <span class="navlink alarm_list <?php echo $default_module === 'alarm_list' ? 'active' : ''; ?>">
                 <span class="material-icons">alarm_on</span>
                 <div class="label">Alarms</div>
             </span>
@@ -336,7 +336,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
 
         </div>
 
-        <div class="module alarm_list <?php echo $default_module === 'alarm' ? 'active' : ''; ?>">
+        <div class="module alarm_list <?php echo $default_module === 'alarm_list' ? 'active' : ''; ?>">
 
         <?php if ($radio_status['Alarm'] === 'enabled') { ?>
 
