@@ -38,7 +38,7 @@ TODO: Adjust the Dockerfile for production (copy files instead of mounting volum
 * Configure webserver to be able to access system audio (i.e. add webserver user to `audio` group via `sudo usermod -aG audio www-data`)
 * If you want to use the scheduled alarm feature:
     * Install a cron service and create a crontab for the webserver user (e.g. `sudo -u www-data crontab -e`)
-    * In systemd, disable the [private tmp directory][systemd-private-tmp] of the webserver (`PrivateTmp=false` in ` /lib/systemd/system/apache2.service` or `/usr/lib/systemd/system/httpd.service` or `/usr/lib/systemd/system/nginx.service`). Beware that this may be overwritten on system updates.
+    * In systemd, disable the [private tmp directory][systemd-private-tmp] of the webserver (`PrivateTmp=false` in ` /etc/httpd/conf.d/myConfig.conf`).
 * Symlink [the frontend](./fontend/) to your webserver's document root
 
 
