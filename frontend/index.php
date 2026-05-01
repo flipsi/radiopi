@@ -65,13 +65,24 @@ function parse_radio_status($radio_status_output) {
             $key = $split[0];
             $value = $split[1];
             if (strpos($key, 'Alarm ID') === 0) {
-                // value looks like: "7:0 (1-5) Station: random"
-                preg_match('/(.*) Station: (.*)/', $value, $matches);
-                $radio_status['Alarm list'][] = array(
-                    'id' => substr($key, 9),
-                    'status' => $matches[1],
-                    'station' => $matches[2]
-                );
+                // value looks like: "7:0 (1-5) Station: random Status: active"
+                if (preg_match('/(.*) Station: (.*) Status: (.*)/', $value, $matches)) {
+                    $radio_status['Alarm list'][] = array(
+                        'id' => substr($key, 9),
+                        'status' => $matches[1],
+                        'station' => $matches[2],
+                        'enabled' => ($matches[3] === 'active')
+                    );
+                } else {
+                    // Fallback for old output format
+                    preg_match('/(.*) Station: (.*)/', $value, $matches);
+                    $radio_status['Alarm list'][] = array(
+                        'id' => substr($key, 9),
+                        'status' => $matches[1],
+                        'station' => $matches[2],
+                        'enabled' => true
+                    );
+                }
                 $radio_status['Alarm'] = 'enabled';
             } else {
                 $radio_status[$key] = $value;
@@ -133,13 +144,21 @@ if (!empty($_POST['action'])) {
             $id = isset($_POST['id']) ? $_POST['id'] : '';
             exec_radio_script("remove $id", $action_output, $action_exit_code);
             break;
+        case 'disable_alarm':
+            $id = isset($_POST['id']) ? $_POST['id'] : '';
+            exec_radio_script("disable $id", $action_output, $action_exit_code);
+            break;
+        case 'enable_alarm':
+            $id = isset($_POST['id']) ? $_POST['id'] : '';
+            exec_radio_script("enable $id", $action_output, $action_exit_code);
+            break;
         default:
     }
     // prevent form resubmission with PRG pattern
     if (empty($errors)) {
         unset($_POST);
         $fragment = '';
-        if ($action === 'add_alarm' || $action === 'remove_alarm') {
+        if ($action === 'add_alarm' || $action === 'remove_alarm' || $action === 'disable_alarm' || $action === 'enable_alarm') {
             $fragment = '#alarm_list';
         }
         header('Location: ' . $_SERVER['PHP_SELF'] . $fragment);
@@ -361,9 +380,9 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                         }
                     }
                     $days_str = implode(', ', $days_formatted);
+                    $is_enabled = $alarm['enabled'];
             ?>
-                <form class="active-alarm" name="alarm_remove_form_<?php echo $alarm['id']; ?>" action="" method="post">
-                    <input type="hidden" name="action" value="remove_alarm" />
+                <form class="active-alarm <?php echo $is_enabled ? '' : 'disabled'; ?>" name="alarm_remove_form_<?php echo $alarm['id']; ?>" action="" method="post">
                     <input type="hidden" name="id" value="<?php echo $alarm['id']; ?>" />
                     <div class="block spread active-alarm-row">
                         <div class="status">
@@ -371,20 +390,43 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                             <div class="days-label"><?php echo $days_str; ?></div>
                             <div class="station-label">Station: <?php echo $alarm['station']; ?></div>
                         </div>
-                        <div class="submit">
-                            <span class="material-icons playbackbutton">close</span>
-                            Remove
+                        <div class="submit-group">
+                            <?php if ($is_enabled) { ?>
+                                <div class="submit inline-button">
+                                    <input type="hidden" name="action" value="disable_alarm" />
+                                    <span class="material-icons playbackbutton">pause_circle_outline</span>
+                                    Disable
+                                </div>
+                            <?php } else { ?>
+                                <div class="submit inline-button">
+                                    <input type="hidden" name="action" value="enable_alarm" />
+                                    <span class="material-icons playbackbutton">play_circle_outline</span>
+                                    Enable
+                                </div>
+                            <?php } ?>
+                            <div class="submit inline-button">
+                                <input type="hidden" name="action" value="remove_alarm" />
+                                <span class="material-icons playbackbutton">close</span>
+                                Remove
+                            </div>
                         </div>
                     </div>
                 </form>
             <?php } ?>
 
             <div class="block remove-all-container align-right">
-                <form name="remove_all_alarms_form" action="" method="post">
+                <form name="remove_all_alarms_form" action="" method="post" style="display:inline-block">
                     <input type="hidden" name="action" value="remove_alarm" />
                     <div class="submit">
                         <span class="material-icons playbackbutton">delete_sweep</span>
-                        Remove all alarms
+                        Remove all
+                    </div>
+                </form>
+                <form name="disable_all_alarms_form" action="" method="post" style="display:inline-block">
+                    <input type="hidden" name="action" value="disable_alarm" />
+                    <div class="submit">
+                        <span class="material-icons playbackbutton">pause_circle_filled</span>
+                        Disable all
                     </div>
                 </form>
             </div>

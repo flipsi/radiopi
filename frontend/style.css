@@ -340,3 +340,18 @@ footer span:last-child {
   text-decoration: none;
 }
 
+.submit-group {
+  display: flex;
+  gap: 10px;
+}
+.inline-button {
+  margin: 0 !important;
+  flex: 1;
+}
+.active-alarm.disabled {
+  opacity: 0.5;
+  background-color: #eee;
+}
+.active-alarm.disabled .time {
+  text-decoration: line-through;
+}

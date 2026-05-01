@@ -30,6 +30,8 @@ SYNOPSIS
     $SELF volume [[+-]<num>]                    Set (or get) audio volume (get has a known bug). This will also abort the volume increments in case of the --wake-up functionality.
     $SELF add <H> <M> [<D> [<DOW> [<S>]]]       Schedule alarm at <Hour>:<Minute> for <Duration> mins on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day) with station <S> (or random if omitted).
     $SELF remove [<ID>]                         Remove scheduled alarm (all or by ID).
+    $SELF disable [<ID>]                        Disable scheduled alarm.
+    $SELF enable [<ID>]                         Enable scheduled alarm.
     $SELF help                                  Print this help message.
 
 DESCRIPTION
@@ -499,13 +501,20 @@ function _echo_alarm_status() {
             for line in "${ALARM_LINES[@]}"; do
                 # Extract minute, hour, day-of-week
                 # Line format: min hour * * dow command # ALARM_CRON_LINE [ID]
-                MINUTE=$(echo "$line" | gawk '{print $1}')
-                HOUR=$(echo "$line" | gawk '{print $2}')
-                DOW=$(echo "$line" | gawk '{print $5}')
-                ID=$(echo "$line" | gawk -v id="$ALARM_CRON_LINE" '{match($0, id " ([0-9]+)", m); print m[1]}')
+                local STATUS="active"
+                local PARSE_LINE="$line"
+                if [[ "$line" =~ ^[[:space:]]*# ]]; then
+                    STATUS="disabled"
+                    PARSE_LINE=$(echo "$line" | sed 's/^[[:space:]]*#[[:space:]]*//')
+                fi
+
+                MINUTE=$(echo "$PARSE_LINE" | gawk '{print $1}')
+                HOUR=$(echo "$PARSE_LINE" | gawk '{print $2}')
+                DOW=$(echo "$PARSE_LINE" | gawk '{print $5}')
+                ID=$(echo "$PARSE_LINE" | gawk -v id="$ALARM_CRON_LINE" '{match($0, id " ([0-9]+)", m); print m[1]}')
                 if [[ -z "$ID" ]]; then ID="old"; fi
-                STATION=$(echo "$line" | gawk '{if (match($0, /-w '\''([^'\'']*)'\''/, m)) print m[1]; else if (match($0, /-r -w/)) print "random"; else print "random"}')
-                echo "Alarm ID $ID: $HOUR:$MINUTE ($DOW) Station: $STATION"
+                STATION=$(echo "$PARSE_LINE" | gawk '{if (match($0, /-w '\''([^'\'']*)'\''/, m)) print m[1]; else if (match($0, /-r -w/)) print "random"; else print "random"}')
+                echo "Alarm ID $ID: $HOUR:$MINUTE ($DOW) Station: $STATION Status: $STATUS"
             done
         else
             echo "Alarm: disabled"
@@ -598,6 +607,38 @@ function _remove_alarm_inner() {
         PATTERN="$ALARM_CRON_LINE $ID"
     fi
     gawk -i inplace -v rmv="$PATTERN" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+}
+
+function _disable_alarm() {
+    local ID="$1"
+    _open_crontab
+    local PATTERN="$ALARM_CRON_LINE"
+    if [[ -n "$ID" ]]; then
+        PATTERN="$ALARM_CRON_LINE $ID"
+    fi
+    gawk -i inplace -v pat="$PATTERN" '$0 ~ pat && $0 !~ /^[[:space:]]*#/ {print "#" $0; next} {print}' "$TMP_CRONTAB_FILE"
+    _close_crontab
+    if [[ -n "$ID" ]]; then
+        echo "Disabled scheduled alarm ID $ID."
+    else
+        echo "Disabled all scheduled alarms."
+    fi
+}
+
+function _enable_alarm() {
+    local ID="$1"
+    _open_crontab
+    local PATTERN="$ALARM_CRON_LINE"
+    if [[ -n "$ID" ]]; then
+        PATTERN="$ALARM_CRON_LINE $ID"
+    fi
+    gawk -i inplace -v pat="$PATTERN" '$0 ~ pat && $0 ~ /^[[:space:]]*#/ {sub(/^[[:space:]]*#/, ""); print; next} {print}' "$TMP_CRONTAB_FILE"
+    _close_crontab
+    if [[ -n "$ID" ]]; then
+        echo "Enabled scheduled alarm ID $ID."
+    else
+        echo "Enabled all scheduled alarms."
+    fi
 }
 
 function _disable_timer_inner() {
@@ -714,6 +755,16 @@ function _main() {
             remove)
                 require crontab
                 _remove_alarm "$2"
+                exit 0
+                ;;
+            disable)
+                require crontab
+                _disable_alarm "$2"
+                exit 0
+                ;;
+            enable)
+                require crontab
+                _enable_alarm "$2"
                 exit 0
                 ;;
             *)
