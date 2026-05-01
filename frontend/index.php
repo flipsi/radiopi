@@ -114,7 +114,7 @@ if (!empty($_POST['action'])) {
         case 'disable_timer':
             exec_radio_script("nosleep", $action_output, $action_exit_code);
             break;
-        case 'enable_alarm':
+        case 'add_alarm':
             preg_match('/(\d\d):(\d\d)/', $_POST['alarmtime'], $alarmtime_matches);
             preg_match('/(\d+)/', $_POST['alarmduration'], $alarmduration_matches);
             $hour = $alarmtime_matches[1];
@@ -127,11 +127,11 @@ if (!empty($_POST['action'])) {
                 }
             }
             $station = isset($_POST['alarmstation']) ? $_POST['alarmstation'] : '';
-            exec_radio_script("enable $hour $minute $duration '$days' '$station'", $action_output, $action_exit_code);
+            exec_radio_script("add $hour $minute $duration '$days' '$station'", $action_output, $action_exit_code);
             break;
-        case 'disable_alarm':
+        case 'remove_alarm':
             $id = isset($_POST['id']) ? $_POST['id'] : '';
-            exec_radio_script("disable $id", $action_output, $action_exit_code);
+            exec_radio_script("remove $id", $action_output, $action_exit_code);
             break;
         default:
     }
@@ -139,7 +139,7 @@ if (!empty($_POST['action'])) {
     if (empty($errors)) {
         unset($_POST);
         $fragment = '';
-        if ($action === 'enable_alarm' || $action === 'disable_alarm') {
+        if ($action === 'add_alarm' || $action === 'remove_alarm') {
             $fragment = '#alarm_list';
         }
         header('Location: ' . $_SERVER['PHP_SELF'] . $fragment);
@@ -362,8 +362,8 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                     }
                     $days_str = implode(', ', $days_formatted);
             ?>
-                <form class="active-alarm" name="alarm_disable_form_<?php echo $alarm['id']; ?>" action="" method="post">
-                    <input type="hidden" name="action" value="disable_alarm" />
+                <form class="active-alarm" name="alarm_remove_form_<?php echo $alarm['id']; ?>" action="" method="post">
+                    <input type="hidden" name="action" value="remove_alarm" />
                     <input type="hidden" name="id" value="<?php echo $alarm['id']; ?>" />
                     <div class="block spread active-alarm-row">
                         <div class="status">
@@ -373,18 +373,18 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
                         </div>
                         <div class="submit">
                             <span class="material-icons playbackbutton">close</span>
-                            Disable
+                            Remove
                         </div>
                     </div>
                 </form>
             <?php } ?>
 
-            <div class="block disable-all-container align-right">
-                <form name="disable_all_alarms_form" action="" method="post">
-                    <input type="hidden" name="action" value="disable_alarm" />
+            <div class="block remove-all-container align-right">
+                <form name="remove_all_alarms_form" action="" method="post">
+                    <input type="hidden" name="action" value="remove_alarm" />
                     <div class="submit">
                         <span class="material-icons playbackbutton">delete_sweep</span>
-                        Disable all alarms
+                        Remove all alarms
                     </div>
                 </form>
             </div>
@@ -444,7 +444,7 @@ $default_module = $radio_status['Status'] == 'off' && $radio_status['Alarm'] == 
             </div>
             <div class="block align-right">
                 <div class="submit">
-                    <input type="hidden" name="action" value="enable_alarm" />
+                    <input type="hidden" name="action" value="add_alarm" />
                     <span class="material-icons playbackbutton">done</span>
                     Set alarm
                 </div>

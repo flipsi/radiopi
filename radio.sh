@@ -28,8 +28,8 @@ SYNOPSIS
     $SELF status                                Print information about currently played station.
     $SELF list                                  List available radio stations (hardcoded in this script).
     $SELF volume [[+-]<num>]                    Set (or get) audio volume (get has a known bug). This will also abort the volume increments in case of the --wake-up functionality.
-    $SELF enable <H> <M> [<D> [<DOW> [<S>]]]    Schedule alarm at <Hour>:<Minute> for <Duration> mins on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day) with station <S> (or random if omitted).
-    $SELF disable [<ID>]                        Remove scheduled alarm (all or by ID).
+    $SELF add <H> <M> [<D> [<DOW> [<S>]]]       Schedule alarm at <Hour>:<Minute> for <Duration> mins on day <DOW> (0-7, 0 and 7 are Sunday, or * for every day) with station <S> (or random if omitted).
+    $SELF remove [<ID>]                         Remove scheduled alarm (all or by ID).
     $SELF help                                  Print this help message.
 
 DESCRIPTION
@@ -538,7 +538,7 @@ function _disable_timer() {
     _close_crontab
 }
 
-function _enable_alarm() {
+function _add_alarm() {
     local ALPHA_HOUR="$1"
     local ALPHA_MINUTE="$2"
     local DURATION="$3"
@@ -579,10 +579,10 @@ function _enable_alarm() {
     fi
 }
 
-function _disable_alarm() {
+function _remove_alarm() {
     local ID="$1"
     _open_crontab
-    _disable_alarm_inner "$ID"
+    _remove_alarm_inner "$ID"
     _close_crontab
     if [[ -n "$ID" ]]; then
         echo "Removed scheduled alarm ID $ID."
@@ -591,7 +591,7 @@ function _disable_alarm() {
     fi
 }
 
-function _disable_alarm_inner() {
+function _remove_alarm_inner() {
     local ID="$1"
     local PATTERN="$ALARM_CRON_LINE"
     if [[ -n "$ID" ]]; then
@@ -690,7 +690,7 @@ function _main() {
                     exit 1
                 fi
                 ;;
-            enable)
+            add)
                 require crontab
                 if [[ -n "$2" && "$2" =~ ^[0-9]{1,2}$ && -n "$3" && "$3" =~ ^[0-9]{1,2}$ ]]; then
                     if [[ -n "$4" && "$4" =~ ^[0-9]{1,2}$ ]]; then
@@ -704,16 +704,16 @@ function _main() {
                         exit 1
                     fi
                     STATION="$6"
-                    _enable_alarm "$2" "$3" "$DURATION" "$DAY_OF_WEEK" "$STATION"
+                    _add_alarm "$2" "$3" "$DURATION" "$DAY_OF_WEEK" "$STATION"
                     exit 0
                 else
                     echo "ERROR: Hour and minute required as separate arguments."
                     exit 1
                 fi
                 ;;
-            disable)
+            remove)
                 require crontab
-                _disable_alarm "$2"
+                _remove_alarm "$2"
                 exit 0
                 ;;
             *)
