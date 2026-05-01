@@ -606,7 +606,10 @@ function _remove_alarm_inner() {
     if [[ -n "$ID" ]]; then
         PATTERN="$ALARM_CRON_LINE $ID"
     fi
-    gawk -i inplace -v rmv="$PATTERN" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+    local TMP_FILE
+    TMP_FILE=$(mktemp)
+    gawk -v rmv="$PATTERN" '!index($0,rmv)' "$TMP_CRONTAB_FILE" > "$TMP_FILE"
+    mv "$TMP_FILE" "$TMP_CRONTAB_FILE"
 }
 
 function _disable_alarm() {
@@ -616,7 +619,10 @@ function _disable_alarm() {
     if [[ -n "$ID" ]]; then
         PATTERN="$ALARM_CRON_LINE $ID"
     fi
-    gawk -i inplace -v pat="$PATTERN" '$0 ~ pat && $0 !~ /^[[:space:]]*#/ {print "#" $0; next} {print}' "$TMP_CRONTAB_FILE"
+    local TMP_FILE
+    TMP_FILE=$(mktemp)
+    gawk -v pat="$PATTERN" 'index($0, pat) && $0 !~ /^[[:space:]]*#/ {print "#" $0; next} {print}' "$TMP_CRONTAB_FILE" > "$TMP_FILE"
+    mv "$TMP_FILE" "$TMP_CRONTAB_FILE"
     _close_crontab
     if [[ -n "$ID" ]]; then
         echo "Disabled scheduled alarm ID $ID."
@@ -632,7 +638,10 @@ function _enable_alarm() {
     if [[ -n "$ID" ]]; then
         PATTERN="$ALARM_CRON_LINE $ID"
     fi
-    gawk -i inplace -v pat="$PATTERN" '$0 ~ pat && $0 ~ /^[[:space:]]*#/ {sub(/^[[:space:]]*#/, ""); print; next} {print}' "$TMP_CRONTAB_FILE"
+    local TMP_FILE
+    TMP_FILE=$(mktemp)
+    gawk -v pat="$PATTERN" 'index($0, pat) && $0 ~ /^[[:space:]]*#/ {sub(/^[[:space:]]*#/, ""); print; next} {print}' "$TMP_CRONTAB_FILE" > "$TMP_FILE"
+    mv "$TMP_FILE" "$TMP_CRONTAB_FILE"
     _close_crontab
     if [[ -n "$ID" ]]; then
         echo "Enabled scheduled alarm ID $ID."
@@ -642,7 +651,10 @@ function _enable_alarm() {
 }
 
 function _disable_timer_inner() {
-    gawk -i inplace -v rmv="$TIMER_CRON_LINE" '!index($0,rmv)' "$TMP_CRONTAB_FILE"
+    local TMP_FILE
+    TMP_FILE=$(mktemp)
+    gawk -v rmv="$TIMER_CRON_LINE" '!index($0,rmv)' "$TMP_CRONTAB_FILE" > "$TMP_FILE"
+    mv "$TMP_FILE" "$TMP_CRONTAB_FILE"
 }
 
 function _main() {
